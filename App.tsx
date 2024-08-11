@@ -1,118 +1,144 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useState, useRef } from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
   View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
 } from 'react-native';
+import PdfViewer from './pdfviewer.tsx'
+import SummarView from './summary.tsx'
+import DetailView from './detailed.tsx'
+const { width } = Dimensions.get('window');
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const onboardingData = [
+  {
+    id: '0',
+    title: 'PDF View',
+    description: 'Adjust your system to speed up your checkout.',
+    component: PdfViewer,
+  },
+  {
+    id: '1',
+    title: 'Summary View',
+    description: 'Faster checkouts with customized settings.',
+    component: SummarView,
+  },
+  {
+    id: '2',
+    title: 'Detailed View',
+    description: 'Get a quick overview of your settings.',
+    component: DetailView,
+  },
+];
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const OnboardingScreen = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef(null);
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+  const renderItem = ({ item }) => (
+    <View style={styles.slide}>
+      <View style={styles.pdfContainer}>
+        <item.component />
+      </View>
     </View>
   );
-}
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const handleTabPress = (index) => {
+    flatListRef.current?.scrollToIndex({ index: index, animated: true });
+    setCurrentIndex(index);
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <SafeAreaView style={styles.container}>
+      <FlatList
+        contentContainerStyle={{alignItems:'center'}}
+        ref={flatListRef}
+        data={onboardingData}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={(event) => {
+          const newIndex = Math.floor(
+            event.nativeEvent.contentOffset.x / width
+          );
+          setCurrentIndex(newIndex);
+        }}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+      <View style={styles.tabContainer}>
+        {onboardingData.map((item, index) => (
+          <TouchableOpacity
+            key={item.id}
+            style={[
+              styles.tab,
+              currentIndex === index && styles.selectedTab
+            ]}
+            onPress={() => handleTabPress(index)}
+          >
+            <Text style={[
+              styles.tabText,
+              currentIndex === index && styles.selectedTabText
+            ]}>
+              {item.title}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
   },
-  sectionTitle: {
-    fontSize: 24,
+  slide: {
+    width: width,
+    height: '100%',
+  },
+  pdfContainer: {
+    flex: 1,
+    width: width,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 25,
+    padding: 5,
+    width: width * 0.9,
+    alignSelf: 'center',
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 20,
+  },
+  selectedTab: {
+    backgroundColor: '#5D3FD3',
+  },
+  tabText: {
+    fontSize: 14,
     fontWeight: '600',
+    color: '#666',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  selectedTabText: {
+    color: '#FFFFFF',
   },
 });
 
-export default App;
+export default OnboardingScreen;
