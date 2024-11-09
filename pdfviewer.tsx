@@ -55,7 +55,7 @@ Recruiting Team`;
   };
 
   render() {
-    const path = "https://pdftron.s3.amazonaws.com/downloads/pl/PDFTRON_mobile_about.pdf";
+    const path = "http://hetanthakkar.github.io/portfolio/cv.pdf";
     const { isShortlisted } = this.state;
 
     return (
@@ -73,23 +73,9 @@ Recruiting Team`;
               : "ic_arrow_back_white_24dp"
           }
           onLeadingNavButtonPressed={this.onLeadingNavButtonPressed}
+          
         />
-        <TouchableOpacity
-          style={[styles.iconButton, styles.leftButton]}
-          onPress={this.handleSendEmail}
-        >
-          <Icon name="mail" size={24} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.iconButton, styles.rightButton]}
-          onPress={this.handleShortlist}
-        >
-          <Icon 
-            name={isShortlisted ? "favorite" : "favorite-border"} 
-            size={24} 
-            color={isShortlisted ? "#ff0000" : "#fff"} 
-          />
-        </TouchableOpacity>
+      
 
         
       </View>

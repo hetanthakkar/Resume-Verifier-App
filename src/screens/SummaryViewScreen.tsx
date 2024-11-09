@@ -42,6 +42,9 @@ const AnalysisCard = ({ title, children }) => (
 const RecruiterAnalysisDashboard = () => {
   return (
     <ScrollView style={styles.container}>
+            <View style={styles.header}>
+        <Text style={styles.headerText}>Detailed View</Text>
+      </View>
       <AnalysisCard title="Experience Match Analysis">
         <View style={styles.row}>
           <Text style={styles.label}>Years of Experience:</Text>
@@ -98,45 +101,99 @@ const RecruiterAnalysisDashboard = () => {
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
+  // Container styles
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#FFFFFF',
   },
+  
+  // Header styles
+  header: {
+    alignItems: 'center',
+    marginBottom: 24,
+    paddingVertical: 16,
+  },
+  headerText: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#007AFF',
+    marginTop: 20,
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
+  
+  // Card styles
   card: {
     marginBottom: 16,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    padding: 16,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#1A1A1A',
+    marginBottom: 12,
+    letterSpacing: 0.25,
   },
+  
+  // Row layout styles
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingVertical: 4,
   },
+  
+  // Text styles
   label: {
     fontSize: 16,
     fontWeight: '600',
+    color: '#2C3E50',
+    letterSpacing: 0.15,
   },
   value: {
     fontSize: 16,
+    color: '#34495E',
+    letterSpacing: 0.15,
   },
   explanation: {
     fontSize: 14,
-    color: '#666',
+    color: '#666666',
     marginBottom: 12,
+    lineHeight: 20,
+    letterSpacing: 0.25,
   },
+  
+  // List styles
   listItem: {
     flexDirection: 'row',
-    marginBottom: 4,
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    paddingVertical: 2,
   },
   bullet: {
     marginRight: 8,
+    fontSize: 16,
+    color: '#007AFF',
+    lineHeight: 20,
   },
   listText: {
     flex: 1,
+    fontSize: 14,
+    color: '#2C3E50',
+    lineHeight: 20,
   },
 });
 
