@@ -11,11 +11,11 @@ import {
   Alert,
   TextInput,
   ActivityIndicator,
-  Clipboard,
   Platform,
 } from 'react-native';
-import Modal from 'react-native-modal';
+import Clipboard from '@react-native-clipboard/clipboard';
 
+import Modal from 'react-native-modal';
 import {
   Svg,
   Defs,
@@ -91,7 +91,7 @@ const JobCard: React.FC<JobCardProps> = ({
     return formattedDate;
   };
   const copyJobId = () => {
-    Clipboard.setString(job.id);
+    Clipboard.setString(toString(job.id));
     Alert.alert('Success', 'Job ID copied to clipboard');
   };
   return (

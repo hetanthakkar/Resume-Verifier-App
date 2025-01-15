@@ -17,6 +17,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import GoogleAuth from './GoogleAuth';
 const WelcomeScreen = ({navigation}) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollViewRef = useRef();
@@ -53,6 +54,18 @@ const WelcomeScreen = ({navigation}) => {
     };
     checkOnboarding();
   });
+  const handleGoogleSignIn = async () => {
+    const {signIn} = GoogleAuth();
+
+    const {success, user, error} = await signIn();
+    if (success) {
+      // Handle successful login
+      console.log('Logged in user:', user);
+    } else {
+      // Handle error
+      console.error('Login failed:', error);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -124,7 +137,7 @@ const WelcomeScreen = ({navigation}) => {
             <>
               <TouchableOpacity
                 style={styles.socialButton}
-                onPress={() => console.log('Continue with Google')}>
+                onPress={handleGoogleSignIn}>
                 <FontAwesome
                   name="google"
                   size={20}

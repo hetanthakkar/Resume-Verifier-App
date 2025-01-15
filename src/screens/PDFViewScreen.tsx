@@ -6,7 +6,6 @@ import {RouteNameContext} from '../../App';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_BASE_URL = 'http://localhost:8000/api';
-const path = 'https://pdftron.s3.amazonaws.com/downloads/pl/PDFTRON_about.pdf';
 
 const PdfViewScreen = ({route}) => {
   const {setCurrentRouteName} = React.useContext(RouteNameContext);
@@ -61,9 +60,10 @@ const PdfViewScreen = ({route}) => {
           Config.Buttons.searchButton,
           Config.Buttons.shareButton,
         ]}
+        annotationToolbars={[]}
         bottomToolbar={[]}
         hideDefaultAnnotationToolbars={[
-          Config.DefaultToolbars.Annotate,
+          // Config.DefaultToolbars.Annotate,
           Config.DefaultToolbars.Favorite,
           Config.DefaultToolbars.FillAndSign,
           Config.DefaultToolbars.Redaction,
@@ -74,7 +74,7 @@ const PdfViewScreen = ({route}) => {
           Config.DefaultToolbars.Insert,
           Config.DefaultToolbars.Draw,
         ]}
-        document={path}
+        document={Platform.OS === 'ios' ? uri.replace('file://', '') : uri}
         showLeadingNavButton={true}
         leadingNavButtonIcon={
           Platform.OS === 'ios'

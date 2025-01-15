@@ -226,6 +226,7 @@ Recruiting Team`,
       setJob(data);
       setOriginalJob(data);
       setShowCreatedMessage(true);
+      setIsEditing(true);
     } catch (error) {
       Alert.alert('Error', error.message || 'Failed to create job');
     } finally {

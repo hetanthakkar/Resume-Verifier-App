@@ -331,9 +331,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
             style={styles.gradientCard}>
-            {isUploading ? (
-              <ActivityIndicator size="large" color="#FFF" />
-            ) : (
+            {!isUploading && (
               <>
                 <Icon name="cloud-upload-outline" size={50} color="#FFF" />
                 <Text style={styles.uploadText}>Upload PDF</Text>
@@ -343,7 +341,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
           </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[
             styles.bulkUploadButton,
             isUploading && styles.disabledButton,
@@ -352,7 +350,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
           disabled={isUploading}>
           <Icon name="documents-outline" size={24} color="#007AFF" />
           <Text style={styles.bulkUploadText}>Bulk Upload PDFs</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {uploadedFiles.length > 0 && (
           <View style={styles.uploadedFiles}>

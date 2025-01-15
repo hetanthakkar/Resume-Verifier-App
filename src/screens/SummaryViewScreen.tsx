@@ -111,7 +111,7 @@ const JobMatchTab = ({jobMatch}) => {
         ))}
       </View>
 
-      <View style={styles.skillsSection}>
+      <View style={styles.preferredSkillsSection}>
         <Text style={styles.sectionTitle}>Preferred Skills</Text>
         {jobMatch.preferred_skills_matched.map((skill, index) => (
           <SkillMatchCard key={`pref-${index}`} {...skill} />
@@ -434,6 +434,8 @@ const styles = StyleSheet.create({
   tabContent: {
     flex: 1,
     padding: 16,
+    // paddingVertical: 24,
+    marginBottom: 10,
   },
   projectCard: {
     marginBottom: 16,
@@ -613,6 +615,10 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 24,
   },
+  preferredSkillsSection: {
+    gap: 12,
+    marginBottom: 24,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
@@ -656,6 +662,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 12,
     elevation: 2,
+    marginBottom: 16,
   },
   skillName: {
     fontSize: 16,
