@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,13 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
-import { RouteNameContext } from '../../App';
+import {RouteNameContext} from '../../App';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const API_BASE_URL = 'http://localhost:8000/api';
 
 interface Candidate {
   id: string;
@@ -23,7 +26,7 @@ interface CandidateCardProps {
   position: string;
   colors: string[];
   navigation: any;
-  setCurrentRouteName:any
+  setCurrentRouteName: any;
 }
 
 const CandidateCard: React.FC<CandidateCardProps> = ({
@@ -31,17 +34,18 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   position,
   colors,
   navigation,
-  setCurrentRouteName
+  setCurrentRouteName,
 }) => (
-  <TouchableOpacity onPress={() => {
-    setCurrentRouteName("InnerHome")
-    navigation.navigate("PdfView")}}>
+  <TouchableOpacity
+    onPress={() => {
+      setCurrentRouteName('InnerHome');
+      navigation.navigate('PdfView');
+    }}>
     <LinearGradient
       colors={colors}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.candidateCard}
-    >
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={styles.candidateCard}>
       <View style={styles.candidateInfo}>
         <Text style={styles.candidateName}>{name}</Text>
         <Text style={styles.candidatePosition}>{position}</Text>
@@ -57,27 +61,63 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
 interface ShortlistedCandidatesProps {
   navigation: any;
 }
+const ShortlistedCandidates: React.FC<ShortlistedCandidatesProps> = ({
+  navigation,
+  route,
+}) => {
+  const {setCurrentRouteName} = React.useContext(RouteNameContext);
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const jobId = route.params?.id;
+  console.log('jobId', route, navigation);
 
-const ShortlistedCandidates: React.FC<ShortlistedCandidatesProps> = ({ navigation }) => {
-  const { setCurrentRouteName } = React.useContext(RouteNameContext);
+  const fetchShortlistedCandidates = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
 
-  const candidates: Candidate[] = [
-    { id: '1', name: 'John Smith', position: 'Software Engineer' },
-    { id: '2', name: 'Emily Johnson', position: 'Data Scientist' },
-    { id: '3', name: 'Michael Brown', position: 'Product Manager' },
-    { id: '4', name: 'Sarah Davis', position: 'UX Designer' },
-  ];
+      const response = await fetch(
+        `${API_BASE_URL}/jobs/${jobId}/shortlisted/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        setCandidates([]);
+        return;
+      }
+      const data = await response.json();
+      setCandidates(data);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchShortlistedCandidates();
+  }, [jobId]);
 
   const gradientColors = [
-    ['#FF6B6B', '#FF8E8E'], // Red
-    ['#4ECDC4', '#45B7A8'], // Teal
-    ['#45AAF2', '#2D98DA'], // Blue
-    ['#FF9FF3', '#F368E0'], // Pink
+    ['#FF6B6B', '#FF8E8E'],
+    ['#4ECDC4', '#45B7A8'],
+    ['#45AAF2', '#2D98DA'],
+    ['#FF9FF3', '#F368E0'],
   ];
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <Text style={styles.title}>Shortlisted Candidates</Text> */}
       <View style={styles.searchContainer}>
         <Ionicons
           name="search"
@@ -93,9 +133,9 @@ const ShortlistedCandidates: React.FC<ShortlistedCandidatesProps> = ({ navigatio
       </View>
       <FlatList
         data={candidates}
-        renderItem={({ item, index }) => (
+        renderItem={({item, index}) => (
           <CandidateCard
-          setCurrentRouteName={setCurrentRouteName}
+            setCurrentRouteName={setCurrentRouteName}
             name={item.name}
             position={item.position}
             colors={gradientColors[index % gradientColors.length]}
@@ -115,7 +155,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
     paddingHorizontal: 16,
     paddingTop: 24,
-    marginTop:20
+    marginTop: 20,
   },
   title: {
     fontSize: 28,
@@ -130,8 +170,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 16,
-    borderWidth:0.5,
-    borderColor:'grey'
+    borderWidth: 0.5,
+    borderColor: 'grey',
   },
   searchIcon: {
     marginRight: 10,
@@ -174,6 +214,11 @@ const styles = StyleSheet.create({
   sendEmailText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

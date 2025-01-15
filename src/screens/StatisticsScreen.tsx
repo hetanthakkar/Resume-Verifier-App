@@ -1,270 +1,323 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Card, ProgressBar, Tooltip } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import LinearGradient from 'react-native-linear-gradient';
+import {SafeAreaView, ScrollView, View, Text, StyleSheet} from 'react-native';
+import {Surface} from 'react-native-paper';
 
-const dummyData = {
-  name: "John Doe",
-  githubMetrics: {
-    repositories: 25,
-    linesOfCode: 150000
-  },
-  experience: 5,
-  technicalSkills: [
-    { name: "JavaScript", proficiency: 0.9 },
-    { name: "Python", proficiency: 0.85 },
-    { name: "React Native", proficiency: 0.8 },
-    { name: "Node.js", proficiency: 0.75 },
-    { name: "SQL", proficiency: 0.7 }
-  ],
-  projectQuality: 8.5,
-  githubQuality: 750,
-  linkedinProjectMatch: 8.5,
-  linkedinExperienceMatch: 9.0,
-  jobMatch: 8,
+const SkillListCard = ({title, requiredSkills, matchedSkills}) => (
+  <StatCard title={title}>
+    {requiredSkills.map((skill, index) => {
+      const matchedSkill = matchedSkills.find(
+        m => m.skill.toLowerCase() === skill.toLowerCase(),
+      );
+      return (
+        <View key={index} style={styles.skillRow}>
+          <Text style={styles.skillName}>{skill}</Text>
+          <Text
+            style={[
+              styles.matchStatus,
+              matchedSkill ? styles.matched : styles.unmatched,
+            ]}>
+            {matchedSkill ? '✓ Match' : '✗ No Match'}
+          </Text>
+        </View>
+      );
+    })}
+  </StatCard>
+);
+
+const StatCard = ({title, children}) => (
+  <Surface style={styles.card}>
+    <Text style={styles.cardTitle}>{title}</Text>
+    {children}
+  </Surface>
+);
+
+const ProgressBar = ({percentage}) => (
+  <View style={styles.progressBarContainer}>
+    <View
+      style={[styles.progressBar, {width: `${Math.min(percentage, 100)}%`}]}
+    />
+  </View>
+);
+
+const StatRow = ({label, value}) => (
+  <View style={styles.statRow}>
+    <Text style={styles.statLabel}>{label}</Text>
+    <Text style={styles.statValue}>{value}</Text>
+  </View>
+);
+
+const MatchList = ({items}) => (
+  <View style={styles.matchList}>
+    {items.map((item, index) => (
+      <View key={index} style={styles.matchItem}>
+        <Text style={styles.skillName}>{item.skill}</Text>
+        <Text style={styles.skillProject}>{item.project}</Text>
+        <Text style={styles.skillDescription}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ResumeStats = ({route}) => {
+  const job = route.params.job;
+  const {analysisData} = route.params;
+  console.log('analysisData', analysisData);
+  const data = analysisData;
+  const {project_verification, profile_match, job_match} = data;
+
+  // Format experience data
+  const experienceItems = profile_match.results.experience.summary.map(exp => ({
+    company: exp.company,
+    title: exp.title,
+    duration: exp.duration,
+    score: exp.match_score.toFixed(1),
+  }));
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.header}>Resume Analysis</Text>
+
+        <StatCard title="Projects">
+          {project_verification.projects.map((project, index) => (
+            <View key={index} style={styles.projectItem}>
+              <Text style={styles.projectName}>{project.name}</Text>
+              <View style={styles.scoreContainer}>
+                <ProgressBar
+                  percentage={(project.verification_score / 10) * 100}
+                />
+                <Text style={styles.scoreText}>
+                  {project.verification_score.toFixed(1)}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </StatCard>
+
+        <StatCard title="Experience Verification">
+          {experienceItems.map((exp, index) => (
+            <View key={index} style={styles.experienceItem}>
+              <View style={styles.experienceHeader}>
+                <Text style={styles.companyName}>{exp.company}</Text>
+                <Text style={styles.duration}>{exp.duration}</Text>
+              </View>
+              <View style={styles.scoreContainer}>
+                <ProgressBar percentage={(exp.score / 10) * 100} />
+                <Text style={styles.scoreText}>{exp.score}</Text>
+              </View>
+            </View>
+          ))}
+        </StatCard>
+
+        <SkillListCard
+          title="Required Skills"
+          requiredSkills={job.required_skills}
+          matchedSkills={job_match.required_skills_matched}
+        />
+
+        <SkillListCard
+          title="Preferred Skills"
+          requiredSkills={job.preferred_skills}
+          matchedSkills={job_match.preferred_skills_matched}
+        />
+      </ScrollView>
+    </SafeAreaView>
+  );
 };
 
-const InfoButton = ({ info }) => (
-  <Tooltip content={<Text>{info}</Text>}>
-    <TouchableOpacity style={styles.infoButton}>
-      <Icon name="information-outline" size={20} color="#3498db" />
-    </TouchableOpacity>
-  </Tooltip>
-);
-
-const CardWithInfo = ({ title, info, icon, children }) => (
-  <Card style={styles.card}>
-    <View style={styles.cardHeader}>
-      <View style={styles.cardTitleContainer}>
-        <Icon name={icon} size={24} color="#3498db" style={styles.cardIcon} />
-        <Text style={styles.cardTitle}>{title}</Text>
-      </View>
-      <InfoButton info={info} />
-    </View>
-    <Card.Content>{children}</Card.Content>
-  </Card>
-);
-
-const ResumeVerificationDashboard = () => (
-  <LinearGradient colors={['#f5f7fa', '#e8ecf1']} style={styles.container}>
-    <ScrollView style={styles.scrollView}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Resume Analysis</Text>
-      </View>
-
-      <CardWithInfo
-        title="Years of Experience"
-        info="Total years of relevant professional experience."
-        icon="briefcase-outline"
-      >
-        <Text style={styles.scoreText}>{dummyData.experience} years</Text>
-      </CardWithInfo>
-
-      <CardWithInfo
-        title="Technical Skills"
-        info="Proficiency in various programming languages based on GitHub activity."
-        icon="code-tags"
-      >
-        {dummyData.technicalSkills.map((skill, index) => (
-          <View key={index} style={styles.skillRow}>
-            <Text style={styles.skillName}>{skill.name}</Text>
-            <View style={styles.progressContainer}>
-              <ProgressBar
-                progress={skill.proficiency}
-                color="#3498db"
-                style={styles.progressBar}
-              />
-            </View>
-            <Text style={styles.percentageText}>
-              {(skill.proficiency * 100).toFixed(0)}%
-            </Text>
-          </View>
-        ))}
-      </CardWithInfo>
-
-      <CardWithInfo
-        title="GitHub Metrics"
-        info="Key metrics from the candidate's GitHub profile."
-        icon="github"
-      >
-        <View style={styles.githubMetrics}>
-          <View style={styles.metricItem}>
-            <View style={styles.metricIconContainer}>
-              <Icon name="code-braces" size={24} color="#3498db" />
-            </View>
-            <Text style={styles.metricValue}>{dummyData.githubMetrics.repositories}</Text>
-            <Text style={styles.metricLabel}>Repositories</Text>
-          </View>
-          <View style={styles.metricItem}>
-            <View style={styles.metricIconContainer}>
-              <Icon name="code-tags" size={24} color="#3498db" />
-            </View>
-            <Text style={styles.metricValue}>
-              {dummyData.githubMetrics.linesOfCode.toLocaleString()}
-            </Text>
-            <Text style={styles.metricLabel}>Lines of Code</Text>
-          </View>
-        </View>
-      </CardWithInfo>
-
-      <CardWithInfo
-        title="Project Accuracy Match"
-        info="How well the candidate's LinkedIn projects match the job requirements."
-        icon="laptop"
-      >
-        <ProgressBar
-          progress={dummyData.linkedinProjectMatch / 10}
-          color="#3498db"
-          style={styles.linkedinMatchBar}
-        />
-        <Text style={styles.matchText}>{dummyData.linkedinProjectMatch}/10</Text>
-      </CardWithInfo>
-
-      <CardWithInfo
-        title="LinkedIn Experience Match"
-        info="How well the candidate's LinkedIn experience matches the job requirements."
-        icon="linkedin"
-      >
-        <ProgressBar
-          progress={dummyData.linkedinExperienceMatch / 10}
-          color="#3498db"
-          style={styles.linkedinMatchBar}
-        />
-        <Text style={styles.matchText}>{dummyData.linkedinExperienceMatch}/10</Text>
-      </CardWithInfo>
-
-      <CardWithInfo
-        title="Percentage Match with the Job"
-        info="How well the candidate's resume matches the job requirements."
-        icon="file"
-      >
-        <ProgressBar
-          progress={dummyData.jobMatch / 10}
-          color="#3498db"
-          style={styles.linkedinMatchBar}
-        />
-        <Text style={styles.matchText}>{dummyData.jobMatch}/10</Text>
-      </CardWithInfo>
-    </ScrollView>
-  </LinearGradient>
-);
-
 const styles = StyleSheet.create({
+  // ... existing styles remain the same ...
   container: {
     flex: 1,
+    backgroundColor: '#f5f6fa',
   },
   scrollView: {
-    flex: 1,
     padding: 16,
   },
   header: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  headerText: {
-    fontSize: 25,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#007AFF',
-    marginTop: 20
+    color: '#2c3e50',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   card: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 16,
-    elevation: 4,
-    backgroundColor: '#ffffff',
+    elevation: 2,
   },
-  cardHeader: {
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#34495e',
+    marginBottom: 16,
+  },
+  // New styles for job match section
+  jobMatchSummary: {
+    gap: 12,
+  },
+  jobMatchDetail: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 8,
+    fontStyle: 'italic',
+  },
+  matchList: {
+    gap: 16,
+  },
+  matchItem: {
+    gap: 4,
+  },
+  skillName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2c3e50',
+    textTransform: 'capitalize',
+  },
+  skillProject: {
+    fontSize: 14,
+    color: '#34495e',
+    fontWeight: '500',
+  },
+  skillDescription: {
+    fontSize: 14,
+    color: '#7f8c8d',
+  },
+  // ... rest of the existing styles ...
+  statRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    marginBottom: 12,
   },
-  cardTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  statLabel: {
+    fontSize: 14,
+    color: '#7f8c8d',
   },
-  cardIcon: {
-    marginRight: 12,
-  },
-  cardTitle: {
+  statValue: {
     fontSize: 16,
     fontWeight: '500',
     color: '#2c3e50',
   },
+  projectItem: {
+    marginBottom: 16,
+  },
+  projectName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#2c3e50',
+    marginBottom: 8,
+  },
+  experienceItem: {
+    marginBottom: 16,
+  },
+  experienceHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  companyName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#2c3e50',
+  },
+  duration: {
+    fontSize: 12,
+    color: '#7f8c8d',
+  },
+  scoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  progressBarContainer: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#ecf0f1',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#3498db',
+  },
   scoreText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#2c3e50',
+    width: 30,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f6fa',
+  },
+  scrollView: {
+    padding: 16,
+  },
+  header: {
     fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
     color: '#2c3e50',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 2,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#34495e',
+    marginBottom: 16,
+  },
+  statRow: {
+    marginBottom: 12,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#7f8c8d',
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#2c3e50',
+  },
+  statDetail: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    fontStyle: 'italic',
+    marginTop: 4,
   },
   skillRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
     marginBottom: 8,
   },
   skillName: {
-    width: 100,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#2c3e50',
+  },
+  matchStatus: {
     fontSize: 14,
-    color: '#2c3e50',
+    fontWeight: '500',
   },
-  progressContainer: {
-    flex: 1,
-    marginHorizontal: 12,
+  matched: {
+    color: '#2ecc71',
   },
-  progressBar: {
-    height: 8,
-    borderRadius: 4,
-  },
-  percentageText: {
-    width: 50,
-    fontSize: 14,
-    color: '#2c3e50',
-    textAlign: 'right',
-  },
-  githubMetrics: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-  },
-  metricItem: {
-    alignItems: 'center',
-    width: '45%',
-  },
-  metricIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f5f7fa',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  metricValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginTop: 5,
-  },
-  metricLabel: {
-    fontSize: 14,
-    color: '#34495e',
-    marginTop: 2,
-  },
-  infoButton: {
-    padding: 8,
-  },
-  linkedinMatchBar: {
-    height: 12,
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-  matchText: {
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+  unmatched: {
+    color: '#e74c3c',
   },
 });
 
-export default ResumeVerificationDashboard;
+export default ResumeStats;

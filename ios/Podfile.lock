@@ -6,7 +6,30 @@ PODS:
   - FBLazyVector (0.74.5)
   - fmt (9.1.0)
   - glog (0.3.5)
-  - PDFNet (3.0.4-5)
+  - lottie-ios (4.5.0)
+  - lottie-react-native (7.2.1):
+    - DoubleConversion
+    - glog
+    - lottie-ios (= 4.5.0)
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Codegen
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - PDFNet (3.0.4-10)
   - RCT-Folly (2024.01.01.00):
     - boost
     - DoubleConversion
@@ -1191,6 +1214,8 @@ PODS:
     - React-logger (= 0.74.5)
     - React-perflogger (= 0.74.5)
     - React-utils (= 0.74.5)
+  - RNCAsyncStorage (2.1.0):
+    - React-Core
   - RNCMaskedView (0.1.11):
     - React
   - RNGestureHandler (2.18.1):
@@ -1337,6 +1362,7 @@ DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - lottie-react-native (from `../node_modules/lottie-react-native`)
   - PDFNet (from `https://pdftron.com/downloads/ios/react-native/latest.podspec`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -1392,6 +1418,7 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNPdftron (from `../node_modules/@pdftron/react-native-pdf`)"
@@ -1403,6 +1430,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - lottie-ios
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -1418,6 +1446,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/fmt.podspec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
+  lottie-react-native:
+    :path: "../node_modules/lottie-react-native"
   PDFNet:
     :podspec: https://pdftron.com/downloads/ios/react-native/latest.podspec
   RCT-Folly:
@@ -1524,6 +1554,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
   RNGestureHandler:
@@ -1548,7 +1580,9 @@ SPEC CHECKSUMS:
   FBLazyVector: ac12dc084d1c8ec4cc4d7b3cf1b0ebda6dab85af
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
-  PDFNet: 148c13892c9b5a41dccffcc117e86267395840ee
+  lottie-ios: a881093fab623c467d3bce374367755c272bdd59
+  lottie-react-native: 795b47c11998b6c7e6da65e08255cb67544072f6
+  PDFNet: 23a1b6649c1a18c7b64e1bbdd9d24ce6f706cd56
   RCT-Folly: 02617c592a293bd6d418e0a88ff4ee1f88329b47
   RCTDeprecation: 121d32efb5b3b0712c2c177beb858d050e5f48c5
   RCTRequired: ec1239bc9d8bf63e10fb92bd8b26171a9258e0c1
@@ -1601,6 +1635,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: dbd12ee396c7ec6dbedc966bc86626b9f158c925
   React-utils: 486900f3bd8f4791635da4070590d16feb38f83f
   ReactCommon: 7bf372968477462e2454456c1b62537ed3635538
+  RNCAsyncStorage: cc6479c4acd84cc7004946946c8afe30b018184d
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNGestureHandler: 3b9da7e2ef053ea3a8cbe0eeff2f2c12251607cb
   RNPdftron: 37d68b8cb05ff0c0516234b640d181842b79c3ab

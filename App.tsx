@@ -1,7 +1,9 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { Provider as PaperProvider } from 'react-native-paper';
+import {NavigationContainer} from '@react-navigation/native';
+import {Provider as PaperProvider} from 'react-native-paper';
 import AppNavigator from './src/navigators/AppNavigator';
+// import "react-native-devsettings/withAsyncStorage";
+import 'react-native-gesture-handler';
 
 interface RouteNameContextType {
   currentRouteName: string | undefined;
@@ -9,14 +11,19 @@ interface RouteNameContextType {
 }
 
 // Define and export the context
-export const RouteNameContext = React.createContext<RouteNameContextType | undefined>(undefined);
+export const RouteNameContext = React.createContext<
+  RouteNameContextType | undefined
+>(undefined);
 
 export default function App() {
-  const [currentRouteName, setCurrentRouteName] = React.useState<string | undefined>(undefined);
+  const [currentRouteName, setCurrentRouteName] = React.useState<
+    string | undefined
+  >(undefined);
 
   return (
     <PaperProvider>
-      <RouteNameContext.Provider value={{ currentRouteName, setCurrentRouteName }}>
+      <RouteNameContext.Provider
+        value={{currentRouteName, setCurrentRouteName}}>
         <NavigationContainer>
           <AppNavigator />
         </NavigationContainer>

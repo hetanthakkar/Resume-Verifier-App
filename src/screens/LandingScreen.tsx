@@ -1,49 +1,62 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, SafeAreaView, StatusBar } from 'react-native';
+import React, {useState, useRef, useEffect} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  SafeAreaView,
+  StatusBar,
+  Platform,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import IonIcons from 'react-native-vector-icons/Ionicons';
 import GradientText from './gradienttext';
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-
-const WelcomeScreen = ({ navigation }) => {
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const WelcomeScreen = ({navigation}) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollViewRef = useRef();
   const carouselItems = [
     {
-      "title": "Experience Check",
-      "text": "Say goodbye to fake job stories. Our AI verifies work history and employment details to ensure authenticity in your hiring process.",
-      "icon": "git-compare-outline",
-      "colors": ['#FF2D55', '#FF3B30']
+      title: 'Experience Check',
+      text: 'Say goodbye to fake job stories. Our AI verifies work history and employment details to ensure authenticity in your hiring process.',
+      icon: 'git-compare-outline',
+      colors: ['#FF2D55', '#FF3B30'],
     },
     {
-      "title": "Project Check",
-      "text": "No more made-up projects. We analyze portfolio submissions and validate technical claims to give you a clear picture of real-world experience.",
-      "icon": "document-text-outline",
-      "colors": ['#5856D6', '#007AFF']
+      title: 'Project Check',
+      text: 'No more made-up projects. We analyze portfolio submissions and validate technical claims to give you a clear picture of real-world experience.',
+      icon: 'document-text-outline',
+      colors: ['#5856D6', '#007AFF'],
     },
     {
-      "title": "Real Coding Skills",
-      "text": "No more overhyped coding claims. Our adaptive assessments evaluate practical abilities and code quality to reveal true technical proficiency.",
-      "icon": "bar-chart-outline",
-      "colors": ['#34C759', '#30B0C7']
-    }
+      title: 'Real Coding Skills',
+      text: 'No more overhyped coding claims. Our adaptive assessments evaluate practical abilities and code quality to reveal true technical proficiency.',
+      icon: 'bar-chart-outline',
+      colors: ['#34C759', '#30B0C7'],
+    },
   ];
 
-  const handleScroll = (event) => {
+  const handleScroll = event => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
     const index = event.nativeEvent.contentOffset.x / slideSize;
     const roundIndex = Math.round(index);
     setActiveIndex(roundIndex);
   };
-
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      // AsyncStorage.clear()
+    };
+    checkOnboarding();
+  });
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <LinearGradient
-        colors={['#FFFFFF', '#F0F0F3']}
-        style={styles.background}
-      >
+      <LinearGradient colors={['#FFFFFF', '#F0F0F3']} style={styles.background}>
         <View style={styles.header}>
           <GradientText />
         </View>
@@ -54,14 +67,12 @@ const WelcomeScreen = ({ navigation }) => {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             onScroll={handleScroll}
-            scrollEventThrottle={16}
-          >
+            scrollEventThrottle={16}>
             {carouselItems.map((item, index) => (
               <View key={index} style={styles.carouselItem}>
                 <LinearGradient
                   colors={item.colors}
-                  style={styles.iconBackground}
-                >
+                  style={styles.iconBackground}>
                   <Ionicons name={item.icon} size={40} color="#FFFFFF" />
                 </LinearGradient>
                 <Text style={styles.carouselTitle}>{item.title}</Text>
@@ -82,25 +93,57 @@ const WelcomeScreen = ({ navigation }) => {
           </View>
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <LinearGradient
-              colors={['#007AFF', '#0056B3']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.buttonGradient}
-            >
-              <Text style={styles.buttonText}>Login</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.signUpButton]}
-            onPress={() => navigation.navigate("Signup")}
-          >
-            <Text style={styles.signUpButtonText}>Sign Up</Text>
-          </TouchableOpacity>
+          {Platform.OS === 'ios' ? (
+            <>
+              <TouchableOpacity
+                style={styles.socialButton}
+                onPress={() => console.log('Continue with Apple')}>
+                <FontAwesome
+                  name="apple"
+                  size={20}
+                  color="#000"
+                  style={styles.icon}
+                />
+                <Text style={styles.socialButtonText}>Continue with Apple</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.socialButton}
+                onPress={() => navigation.navigate('Login')}>
+                <IonIcons
+                  name="mail-open"
+                  size={20}
+                  color="#000"
+                  style={styles.icon}
+                />
+                <Text style={styles.socialButtonText}>
+                  Continue with Work Email
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={styles.socialButton}
+                onPress={() => console.log('Continue with Google')}>
+                <FontAwesome
+                  name="google"
+                  size={20}
+                  color="#DB4437"
+                  style={styles.icon}
+                />
+                <Text style={styles.socialButtonText}>
+                  Continue with Google
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.socialButton}
+                onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.socialButtonText}>
+                  Continue with Work Email
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </LinearGradient>
     </SafeAreaView>
@@ -119,7 +162,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   carouselContainer: {
-    height: screenHeight * 0.6,
+    height: screenHeight * 0.5,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -175,32 +218,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
   },
-  button: {
-    width: '80%',
-    marginBottom: 15,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  buttonGradient: {
-    padding: 16,
+  socialButton: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '80%',
+    padding: 15,
+    marginBottom: 15,
+    // borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    marginTop: 15,
   },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
+  socialButtonText: {
+    fontSize: 16,
     fontWeight: '600',
+    marginLeft: 10,
   },
-  signUpButton: {
-    borderWidth: 1,
-    borderColor: '#007AFF',
-    backgroundColor: 'transparent',
-  },
-  signUpButtonText: {
-    color: '#007AFF',
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-    padding: 16,
+  icon: {
+    marginRight: 10,
   },
 });
 

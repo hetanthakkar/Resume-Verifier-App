@@ -1,7 +1,14 @@
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  ActivityIndicator,
+  View,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LandingScreen from '../screens/LandingScreen';
 import SignupScreen from '../screens/SignupScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -9,23 +16,82 @@ import ForgetPasswordScreen from '../screens/ForgetPasswordScreen';
 import HomeTabNavigator from './HomeTabNavigator';
 
 const Stack = createNativeStackNavigator();
+const API_BASE_URL = 'http://localhost:8000/api';
 
-const BackButton = ({ navigation }) => (
+const BackButton = ({navigation}) => (
   <TouchableOpacity
     style={styles.backButton}
-    onPress={() => navigation.goBack()}
-  >
+    hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+    onPress={() => navigation.goBack()}>
     <Ionicons name="chevron-back" size={28} color="#0056B3" />
   </TouchableOpacity>
 );
 
 const AppNavigator = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const refreshAccessToken = async refreshToken => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/refresh-token/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          refresh: refreshToken,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        await AsyncStorage.setItem('accessToken', data.access);
+        if (data.refresh) {
+          await AsyncStorage.setItem('refreshToken', data.refresh);
+        }
+      }
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+    }
+  };
+
+  const checkAuthStatus = async () => {
+    try {
+      const [accessToken, refreshToken] = await Promise.all([
+        AsyncStorage.getItem('accessToken'),
+        AsyncStorage.getItem('refreshToken'),
+      ]);
+
+      if (accessToken) {
+        setIsAuthenticated(true);
+        // Refresh token in background if refresh token exists
+        if (refreshToken) {
+          refreshAccessToken(refreshToken);
+        }
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#45AAF2" />
+      </View>
+    );
+  }
+
   return (
     <Stack.Navigator
-      initialRouteName="Landing"
-      screenOptions={({ navigation }) => ({
-        headerShown: false,
-        // headerLeft: () => <BackButton navigation={navigation} />,
+      initialRouteName={isAuthenticated ? 'Home' : 'Landing'}
+      screenOptions={({navigation}) => ({
         headerShadowVisible: false,
         headerStyle: {
           backgroundColor: 'transparent',
@@ -35,67 +101,66 @@ const AppNavigator = () => {
           fontSize: 17,
           fontWeight: '600',
         },
-      })}
-    >
-      <Stack.Screen 
-        name="Landing" 
+        headerLeftContainerStyle: styles.headerLeftContainer,
+        headerBackVisible: false,
+      })}>
+      <Stack.Screen
+        name="Landing"
+        options={{
+          headerShown: false,
+          headerTitle: '',
+          headerTransparent: true,
+        }}
         component={LandingScreen}
       />
-
-      <Stack.Screen 
-        name="Signup" 
+      <Stack.Screen
+        name="Signup"
         component={SignupScreen}
-        options={{
+        options={({navigation}) => ({
           headerShown: true,
           headerTitle: '',
           headerTransparent: true,
-        }}
+          headerLeft: () => <BackButton navigation={navigation} />,
+        })}
       />
-
-      <Stack.Screen 
-        name="Login" 
+      <Stack.Screen
+        name="Login"
         component={LoginScreen}
         options={{
-          headerShown: true,
-          headerTitle: '',
-          headerTransparent: true,
+          headerShown: false,
         }}
       />
-
-      <Stack.Screen 
-        name="ForgetPassword" 
+      <Stack.Screen
+        name="ForgotPassword"
         component={ForgetPasswordScreen}
         options={{
-          headerShown: true,
-          headerTitle: '',
-          headerTransparent: true,
+          headerShown: false,
         }}
       />
-
       <Stack.Screen
         name="Home"
         component={HomeTabNavigator}
-        options={{ headerShown: false }}
+        options={{headerShown: false}}
       />
-
     </Stack.Navigator>
   );
 };
 
 const styles = StyleSheet.create({
+  headerLeftContainer: {
+    marginLeft: Platform.OS === 'ios' ? 8 : 0,
+  },
   backButton: {
-    padding: 8,
-    marginLeft: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: Platform.OS === 'ios' ? 0 : 8,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F7FAFC',
   },
 });
 

@@ -1,7 +1,14 @@
 {
   "compilerOptions": {
-    "noEmit": true,
-    "skipLibCheck": true,
-    "checkJs": false // Ensure no checks for JavaScript files
+    "jsx": "react-native", // Enables JSX for React Native
+    "strict": true, // Optional: Enable strict type-checking
+    "esModuleInterop": true, // Ensures compatibility with ES modules
+    "moduleResolution": "node",
+    "skipLibCheck": true, // Skips type checks on declaration files
+    "allowJs": true, // Allows JavaScript files in your project
+    "noEmit": true, // Avoid emitting files
+    "resolveJsonModule": true, // Support importing JSON files
+    "noImplicitAny": false,
+    "useUnknownInCatchVariables": false
   }
 }
