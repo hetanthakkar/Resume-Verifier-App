@@ -1,19 +1,21 @@
 // Install required dependencies:
 // npm install @react-native-google-signin/google-signin axios
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import axios from 'axios';
 import {Platform} from 'react-native';
-
+if (Platform.OS === 'android') {
+  GoogleSignin.configure({
+    webClientId:
+      '483886083006-k3ggj8i676gajk3kumb3c04ov8gp45tv.apps.googleusercontent.com',
+    offlineAccess: true,
+  });
+}
 // Configure Google Sign-In
-GoogleSignin.configure({
-  webClientId:
-    '198848659273-77cgm68u4ptcii0pdtq3jj8hqlqbac08.apps.googleusercontent.com', // Get this from Google Cloud Console
-  offlineAccess: true,
-});
 const API_URL = Platform.select({
   ios: 'http://localhost:8000/api',
   android: 'http://10.0.2.2:8000/api', // Android emulator localhost equivalent
@@ -37,15 +39,19 @@ const GoogleAuth = () => {
       });
 
       // Handle the response from your backend
-      const {refresh, access, user} = response.data;
-      console.log('response', response.data);
+      const {refresh, access, user, is_new_user} = response.data;
+      console.log('google response', response.data);
+      user.accessToken = access;
+      await AsyncStorage.setItem('accessToken', access);
+      await AsyncStorage.setItem('refreshToken', refresh);
+      await AsyncStorage.setItem('userData', JSON.stringify(user));
       // Store the tokens (using your preferred storage method)
       // For example: AsyncStorage.setItem('tokens', JSON.stringify({ refresh, access }));
 
       // Update your app's authentication state
       // For example: dispatch(setUser(user));
 
-      return {success: true, user};
+      return {success: true, user, is_new_user};
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('Sign in cancelled');

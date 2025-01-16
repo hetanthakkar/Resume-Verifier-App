@@ -27,40 +27,50 @@ interface LoginScreenProps {
 
 const {width, height} = Dimensions.get('window');
 
-const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
   // State management
-  const [email, setEmail] = useState<string>('');
-  const [name, setName] = useState<string>('');
+  const googleUser = route.params?.googleUser;
+  const isGoogleSignIn = route.params?.isGoogleSignIn;
+
+  // State management
+  const [email, setEmail] = useState<string>(googleUser?.email || '');
+  const [name, setName] = useState<string>(googleUser?.name || '');
   const [company, setCompany] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmedEmail, setConfirmedEmail] = useState<string>('');
   const [showOTP, setShowOTP] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showName, setShowName] = useState<boolean>(false);
-  const [showCompany, setShowCompany] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(!isGoogleSignIn);
+  const [showName, setShowName] = useState<boolean>(isGoogleSignIn);
+  const [showCompany, setShowCompany] = useState<boolean>(isGoogleSignIn);
   const [otp, setOTP] = useState<string[]>(['', '', '', '', '', '']);
-  const [showLottie, setShowLottie] = useState<boolean>(true);
+  const [showLottie, setShowLottie] = useState<boolean>(!isGoogleSignIn);
   const [isOTPComplete, setIsOTPComplete] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isNewUser, setIsNewUser] = useState<boolean>(false);
+  const [isNewUser, setIsNewUser] = useState<boolean>(
+    isGoogleSignIn === true ? true : false,
+  );
+  const API_URL = Platform.select({
+    ios: 'http://localhost:8000',
+    android: 'http://10.0.2.2:8000', // Android emulator localhost equivalent
+  });
   // Refs
   const otpRefs = useRef<(TextInput | null)[]>([]);
   const lottieRef = useRef<LottieView>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
   // Animations
-  const slideAnimation = useRef(new Animated.Value(0)).current;
+  const slideAnimation = useRef(
+    new Animated.Value(isGoogleSignIn ? 1 : 0),
+  ).current;
   const otpOpacity = useRef(new Animated.Value(0)).current;
   const lottieOpacity = useRef(new Animated.Value(1)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
 
-  // Effects
   useEffect(() => {
-    if (lottieRef.current) {
+    if (lottieRef.current && !isGoogleSignIn) {
       lottieRef.current.play();
     }
   }, []);
-
   // Animation handlers
   const animateTransition = (show: boolean) => {
     Animated.parallel([
@@ -81,7 +91,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
       }
     });
   };
-
   const animateTransition1 = (show: boolean) => {
     Animated.parallel([
       Animated.timing(slideAnimation, {
@@ -124,12 +133,47 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
     const isComplete = newOTP.every(digit => digit.length === 1);
     setIsOTPComplete(isComplete);
   };
+  const handleSubmit = async () => {
+    console.log('handle submit', email);
+    if (!email || !name || !company || isLoading) return;
+    setIsLoading(true);
+
+    try {
+      // Just update the user info
+      const response = await fetch(`${API_URL}/api/auth/update-profile/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${googleUser?.accessToken}`,
+        },
+        body: JSON.stringify({
+          name,
+          company,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        await AsyncStorage.setItem('accessToken', data.access);
+        await AsyncStorage.setItem('refreshToken', data.refresh);
+        await AsyncStorage.setItem('userData', JSON.stringify(data.user));
+        navigation.navigate('Home');
+      } else {
+        Alert.alert('Error', data.error || 'Update failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Error', 'Update failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const handleRegister = async () => {
     if (!email || !name || !company || !password || isLoading) return;
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/register/', {
+      const response = await fetch(`${API_URL}/api/auth/register/`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -158,6 +202,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   };
 
   const handleContinue = async () => {
+    console.log('email', email);
     if (!email || isLoading) return;
     setIsLoading(true);
 
@@ -171,6 +216,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
       }).start(() => setShowLottie(false));
 
       if (isRegistered) {
+        console.log('isRegistered', isRegistered);
         setShowPassword(true);
         setIsNewUser(false);
       } else {
@@ -187,10 +233,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
 
   const checkEmailRegistration = async (email: string) => {
     try {
-      const API_URL = Platform.select({
-        ios: 'http://localhost:8000',
-        android: 'http://10.0.2.2:8000', // Android emulator localhost equivalent
-      });
       const response = await fetch(`${API_URL}/api/auth/check-email/`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -207,10 +249,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   const handleLogin = async () => {
     if (!email || !password || isLoading) return;
     setIsLoading(true);
-    const API_URL = Platform.select({
-      ios: 'http://localhost:8000',
-      android: 'http://10.0.2.2:8000', // Android emulator localhost equivalent
-    });
+
     try {
       const response = await fetch(`${API_URL}/api/auth/login/`, {
         method: 'POST',
@@ -220,7 +259,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
 
       const data = await response.json();
       if (response.ok) {
-        // Store tokens and user data
         await AsyncStorage.setItem('accessToken', data.access);
         await AsyncStorage.setItem('refreshToken', data.refresh);
         await AsyncStorage.setItem('userData', JSON.stringify(data.user));
@@ -229,7 +267,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
         Alert.alert('Error', 'Invalid credentials');
       }
     } catch (error) {
-      console.log('error', error);
+      console.error('Error:', error);
       Alert.alert('Error', 'Login failed');
     } finally {
       setIsLoading(false);
@@ -241,17 +279,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        'http://localhost:8000/api/auth/verify-otp/',
-        {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            email: confirmedEmail,
-            otp: parseInt(otp.join('')),
-          }),
-        },
-      );
+      const response = await fetch(`${API_URL}/api/auth/verify-otp/`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          email: confirmedEmail,
+          otp: parseInt(otp.join('')),
+        }),
+      });
 
       const data = await response.json();
       if (response.ok) {
@@ -291,7 +326,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
               <IonIcons name="chevron-back" size={24} color="#000" />
             </TouchableOpacity>
             <View style={styles.titleContainer}>
-              <GradientText text="Welcome to Resume Scan" fontSize={24} />
+              <GradientText text={'Welcome to Resume Scan'} fontSize={24} />
             </View>
           </View>
 
@@ -322,6 +357,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
                 autoComplete="email"
                 editable={!isLoading}
               />
+              {isGoogleSignIn && (
+                <Text style={styles.googleEmailNote}>
+                  Email provided by Google Sign-in
+                </Text>
+              )}
             </View>
 
             {showName && (
@@ -380,7 +420,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
               </Animated.View>
             )}
 
-            {showPassword && (
+            {showPassword && !isGoogleSignIn && (
               <Animated.View
                 style={[
                   styles.inputContainer,
@@ -469,8 +509,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
             activeOpacity={0.8}
             onPressIn={() => animateButton(true)}
             onPressOut={() => animateButton(false)}
+            // onPress={isGoogleSignIn ? handleSubmit : handleLogin}
             onPress={
-              showPassword
+              isGoogleSignIn
+                ? handleSubmit
+                : showPassword
                 ? isNewUser
                   ? handleRegister
                   : handleLogin
@@ -489,12 +532,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
                 <Text style={styles.buttonText}>
                   {isLoading
                     ? 'Please wait...'
-                    : showPassword
-                    ? isNewUser
-                      ? 'Register'
-                      : 'Login'
-                    : showOTP
-                    ? 'Verify'
+                    : isGoogleSignIn
+                    ? 'Complete Registration'
                     : 'Continue'}
                 </Text>
               </LinearGradient>

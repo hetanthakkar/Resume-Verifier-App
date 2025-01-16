@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* resumeverifierTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* resumeverifierTests.m */; };
+		0D0FFAA4A19F4E1D321D56C7 /* Pods_resumeverifier.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D75E8366F1E72C1B1C06ABD /* Pods_resumeverifier.framework */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		16CB19C2B1633A38E4DEF378 /* Pods_pdf_pdfTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1311E077B75F233B298F7C9A /* Pods_pdf_pdfTests.framework */; };
-		6B2D88E742B65462BC5EAF79 /* Pods_pdf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B3E38A47C88A08A268FA871 /* Pods_pdf.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		AA7F3F22E395B7B0E6B4B86F /* Pods_resumeverifier_resumeverifierTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35F686147D04966FA77E9590 /* Pods_resumeverifier_resumeverifierTests.framework */; };
 		D1C779320C2955B719536D59 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 35BF0C1F35C7744A3C45B4B1 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
@@ -23,25 +23,25 @@
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = "resumeverifier";
+			remoteInfo = resumeverifier;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		00E356EE1AD99517003FC87E /* resumeverifierTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "resumeverifierTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E356EE1AD99517003FC87E /* resumeverifierTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = resumeverifierTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* resumeverifierTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "resumeverifierTests.m"; sourceTree = "<group>"; };
-		1311E077B75F233B298F7C9A /* Pods_pdf_pdfTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_pdf_pdfTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07F961A680F5B00A75B9A /* resumeverifier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "resumeverifier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = "resumeverifier/AppDelegate.h"; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = "resumeverifier/AppDelegate.mm"; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "resumeverifier/Images.xcassets"; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "resumeverifier/Info.plist"; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "resumeverifier/main.m"; sourceTree = "<group>"; };
+		00E356F21AD99517003FC87E /* resumeverifierTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = resumeverifierTests.m; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* resumeverifier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = resumeverifier.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = resumeverifier/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = resumeverifier/AppDelegate.mm; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = resumeverifier/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = resumeverifier/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = resumeverifier/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = resumeverifier/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		1A379C06E8C32DE8496DCE56 /* Pods-resumeverifier-resumeverifierTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-resumeverifier-resumeverifierTests.release.xcconfig"; path = "Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests.release.xcconfig"; sourceTree = "<group>"; };
-		35BF0C1F35C7744A3C45B4B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = resumeverifier/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		3B432D8797443980368036DB /* Pods-resumeverifier.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-resumeverifier.release.xcconfig"; path = "Target Support Files/Pods-resumeverifier/Pods-resumeverifier.release.xcconfig"; sourceTree = "<group>"; };
+		1AA085773E0EEE8C97BA6EEE /* Pods-resumeverifier-resumeverifierTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-resumeverifier-resumeverifierTests.release.xcconfig"; path = "Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests.release.xcconfig"; sourceTree = "<group>"; };
+		301AD4AEE361B328C0A4D35B /* Pods-resumeverifier-resumeverifierTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-resumeverifier-resumeverifierTests.debug.xcconfig"; path = "Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests.debug.xcconfig"; sourceTree = "<group>"; };
+		35BF0C1F35C7744A3C45B4B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = resumeverifier/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		35F686147D04966FA77E9590 /* Pods_resumeverifier_resumeverifierTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_resumeverifier_resumeverifierTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FF2811C2C7191D500495163 /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
 		3FF2811D2C7191D500495163 /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Octicons.ttf; sourceTree = "<group>"; };
 		3FF2811E2C7191D500495163 /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
@@ -80,12 +80,12 @@
 		3FF2813F2C7191D500495163 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ionicons.ttf; sourceTree = "<group>"; };
 		3FF281402C7191D500495163 /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Solid.ttf; sourceTree = "<group>"; };
 		3FF281412C7191D500495163 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Regular.ttf; sourceTree = "<group>"; };
+		41A8E9F24CDEBABCBA4B50E4 /* Pods-resumeverifier.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-resumeverifier.debug.xcconfig"; path = "Target Support Files/Pods-resumeverifier/Pods-resumeverifier.debug.xcconfig"; sourceTree = "<group>"; };
 		457D4ED7425E4EE370E63892 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = resumeverifier/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		7B3E38A47C88A08A268FA871 /* Pods_pdf.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_pdf.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = "resumeverifier/LaunchScreen.storyboard"; sourceTree = "<group>"; };
-		DC1F2DFA2B92BEF081413FE6 /* Pods-resumeverifier-resumeverifierTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-resumeverifier-resumeverifierTests.debug.xcconfig"; path = "Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5D75E8366F1E72C1B1C06ABD /* Pods_resumeverifier.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_resumeverifier.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8065FB12F475F91E73A83CB3 /* Pods-resumeverifier.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-resumeverifier.release.xcconfig"; path = "Target Support Files/Pods-resumeverifier/Pods-resumeverifier.release.xcconfig"; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = resumeverifier/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		EE97728216A1AC2DF9F23A93 /* Pods-resumeverifier.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-resumeverifier.debug.xcconfig"; path = "Target Support Files/Pods-resumeverifier/Pods-resumeverifier.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,7 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				16CB19C2B1633A38E4DEF378 /* Pods_pdf_pdfTests.framework in Frameworks */,
+				AA7F3F22E395B7B0E6B4B86F /* Pods_resumeverifier_resumeverifierTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,7 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B2D88E742B65462BC5EAF79 /* Pods_pdf.framework in Frameworks */,
+				0D0FFAA4A19F4E1D321D56C7 /* Pods_resumeverifier.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,7 +114,7 @@
 				00E356F21AD99517003FC87E /* resumeverifierTests.m */,
 				00E356F01AD99517003FC87E /* Supporting Files */,
 			);
-			path = "resumeverifierTests";
+			path = resumeverifierTests;
 			sourceTree = "<group>";
 		};
 		00E356F01AD99517003FC87E /* Supporting Files */ = {
@@ -138,15 +138,15 @@
 				457D4ED7425E4EE370E63892 /* PrivacyInfo.xcprivacy */,
 				35BF0C1F35C7744A3C45B4B1 /* PrivacyInfo.xcprivacy */,
 			);
-			name = "resumeverifier";
+			name = resumeverifier;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				7B3E38A47C88A08A268FA871 /* Pods_pdf.framework */,
-				1311E077B75F233B298F7C9A /* Pods_pdf_pdfTests.framework */,
+				5D75E8366F1E72C1B1C06ABD /* Pods_resumeverifier.framework */,
+				35F686147D04966FA77E9590 /* Pods_resumeverifier_resumeverifierTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -232,10 +232,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				EE97728216A1AC2DF9F23A93 /* Pods-resumeverifier.debug.xcconfig */,
-				3B432D8797443980368036DB /* Pods-resumeverifier.release.xcconfig */,
-				DC1F2DFA2B92BEF081413FE6 /* Pods-resumeverifier-resumeverifierTests.debug.xcconfig */,
-				1A379C06E8C32DE8496DCE56 /* Pods-resumeverifier-resumeverifierTests.release.xcconfig */,
+				41A8E9F24CDEBABCBA4B50E4 /* Pods-resumeverifier.debug.xcconfig */,
+				8065FB12F475F91E73A83CB3 /* Pods-resumeverifier.release.xcconfig */,
+				301AD4AEE361B328C0A4D35B /* Pods-resumeverifier-resumeverifierTests.debug.xcconfig */,
+				1AA085773E0EEE8C97BA6EEE /* Pods-resumeverifier-resumeverifierTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -247,20 +247,20 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "resumeverifierTests" */;
 			buildPhases = (
-				3E7E79202815E3BFC8476714 /* [CP] Check Pods Manifest.lock */,
+				455C792BA70DD2AD0CC86844 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				390DB6CF83CDA7F865E9491D /* [CP] Embed Pods Frameworks */,
-				04B457D9CFB5C043E8556AB9 /* [CP] Copy Pods Resources */,
+				84D3A5012AAAC55EAFA4D178 /* [CP] Embed Pods Frameworks */,
+				00FB281DBA8D350A958C3204 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				00E356F51AD99517003FC87E /* PBXTargetDependency */,
 			);
-			name = "resumeverifierTests";
-			productname = "resumeverifierTests";
+			name = resumeverifierTests;
+			productName = resumeverifierTests;
 			productReference = 00E356EE1AD99517003FC87E /* resumeverifierTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -268,20 +268,20 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "resumeverifier" */;
 			buildPhases = (
-				FDB99FCB79C65A6250F65FDB /* [CP] Check Pods Manifest.lock */,
+				71F340501C070CB6DBE46402 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				13273C1D7B10342FCA4D3209 /* [CP] Embed Pods Frameworks */,
-				4A122F801E082E579C7DB817 /* [CP] Copy Pods Resources */,
+				BF14453E7F4F9977E26EFF76 /* [CP] Embed Pods Frameworks */,
+				491AA939A71B773B8FF4FD71 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "resumeverifier";
-			productName = "resumeverifier";
+			name = resumeverifier;
+			productName = resumeverifier;
 			productReference = 13B07F961A680F5B00A75B9A /* resumeverifier.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -358,7 +358,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		04B457D9CFB5C043E8556AB9 /* [CP] Copy Pods Resources */ = {
+		00FB281DBA8D350A958C3204 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -375,41 +375,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		13273C1D7B10342FCA4D3209 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-resumeverifier/Pods-resumeverifier-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-resumeverifier/Pods-resumeverifier-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-resumeverifier/Pods-resumeverifier-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		390DB6CF83CDA7F865E9491D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		3E7E79202815E3BFC8476714 /* [CP] Check Pods Manifest.lock */ = {
+		455C792BA70DD2AD0CC86844 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -431,7 +397,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4A122F801E082E579C7DB817 /* [CP] Copy Pods Resources */ = {
+		491AA939A71B773B8FF4FD71 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -448,7 +414,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-resumeverifier/Pods-resumeverifier-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FDB99FCB79C65A6250F65FDB /* [CP] Check Pods Manifest.lock */ = {
+		71F340501C070CB6DBE46402 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -468,6 +434,40 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		84D3A5012AAAC55EAFA4D178 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-resumeverifier-resumeverifierTests/Pods-resumeverifier-resumeverifierTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BF14453E7F4F9977E26EFF76 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-resumeverifier/Pods-resumeverifier-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-resumeverifier/Pods-resumeverifier-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-resumeverifier/Pods-resumeverifier-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -503,14 +503,14 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DC1F2DFA2B92BEF081413FE6 /* Pods-resumeverifier-resumeverifierTests.debug.xcconfig */;
+			baseConfigurationReference = 301AD4AEE361B328C0A4D35B /* Pods-resumeverifier-resumeverifierTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "resumeverifierTests/Info.plist";
+				INFOPLIST_FILE = resumeverifierTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -522,7 +522,7 @@
 					"-lc++",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hetan.resumeverifier";
+				PRODUCT_BUNDLE_IDENTIFIER = com.hetan.resumeverifier;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/resumeverifier.app/resumeverifier";
 			};
@@ -530,11 +530,11 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1A379C06E8C32DE8496DCE56 /* Pods-resumeverifier-resumeverifierTests.release.xcconfig */;
+			baseConfigurationReference = 1AA085773E0EEE8C97BA6EEE /* Pods-resumeverifier-resumeverifierTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
-				INFOPLIST_FILE = "resumeverifierTests/Info.plist";
+				INFOPLIST_FILE = resumeverifierTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -546,7 +546,7 @@
 					"-lc++",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hetan.resumeverifier";
+				PRODUCT_BUNDLE_IDENTIFIER = com.hetan.resumeverifier;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/resumeverifier.app/resumeverifier";
 			};
@@ -554,14 +554,14 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EE97728216A1AC2DF9F23A93 /* Pods-resumeverifier.debug.xcconfig */;
+			baseConfigurationReference = 41A8E9F24CDEBABCBA4B50E4 /* Pods-resumeverifier.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = "resumeverifier/Info.plist";
-             INFOPLIST_KEY_CFBundleDisplayName = "resumeverifier";
+				INFOPLIST_FILE = resumeverifier/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = resumeverifier;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -572,8 +572,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hetan.resumeverifier";
-				PRODUCT_NAME = "resumeverifier";
+				PRODUCT_BUNDLE_IDENTIFIER = com.hetan.resumeverifier;
+				PRODUCT_NAME = resumeverifier;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -582,13 +582,13 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B432D8797443980368036DB /* Pods-resumeverifier.release.xcconfig */;
+			baseConfigurationReference = 8065FB12F475F91E73A83CB3 /* Pods-resumeverifier.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_FILE = "resumeverifier/Info.plist";
-             INFOPLIST_KEY_CFBundleDisplayName = "resumeverifier";
+				INFOPLIST_FILE = resumeverifier/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = resumeverifier;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -599,8 +599,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hetan.resumeverifier";
-				PRODUCT_NAME = "resumeverifier";
+				PRODUCT_BUNDLE_IDENTIFIER = com.hetan.resumeverifier;
+				PRODUCT_NAME = resumeverifier;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

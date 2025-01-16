@@ -14,6 +14,7 @@ import {
   Modal,
   TextInput,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -31,8 +32,11 @@ interface ProfileData {
   email: string;
   company: string;
 }
-const API_BASE_URL = 'http://localhost:8000/api';
 
+const API_BASE_URL = Platform.select({
+  ios: 'http://localhost:8000/api',
+  android: 'http://10.0.2.2:8000/api', // Android emulator localhost equivalent
+});
 interface UserProfile {
   name: string;
   email: string;

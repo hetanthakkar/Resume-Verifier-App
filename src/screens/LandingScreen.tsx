@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   StatusBar,
   Platform,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import IonIcons from 'react-native-vector-icons/Ionicons';
@@ -41,7 +42,10 @@ const WelcomeScreen = ({navigation}) => {
       colors: ['#34C759', '#30B0C7'],
     },
   ];
-
+  const API_URL = Platform.select({
+    ios: 'http://localhost:8000',
+    android: 'http://10.0.2.2:8000', // Android emulator localhost equivalent
+  });
   const handleScroll = event => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
     const index = event.nativeEvent.contentOffset.x / slideSize;
@@ -57,21 +61,39 @@ const WelcomeScreen = ({navigation}) => {
   const handleGoogleSignIn = async () => {
     const {signIn} = GoogleAuth();
 
-    const {success, user, error} = await signIn();
-    if (success) {
-      // Handle successful login
-      console.log('Logged in user:', user);
-    } else {
-      // Handle error
-      console.error('Login failed:', error);
+    try {
+      const {success, user, error, is_new_user} = await signIn();
+      if (success) {
+        if (is_new_user) {
+          navigation.navigate('Home');
+        } else {
+          navigation.navigate('Login', {
+            googleUser: {
+              email: user.email,
+              name: user.name || '',
+              familyName: user.familyName || '',
+              givenName: user.givenName || '',
+              accessToken: user.accessToken,
+            },
+            isGoogleSignIn: true,
+          });
+        }
+      } else {
+        console.error('Login failed:', error);
+        Alert.alert('Error', 'Google sign in failed');
+      }
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      Alert.alert('Error', 'Failed to sign in with Google');
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <LinearGradient colors={['#FFFFFF', '#F0F0F3']} style={styles.background}>
         <View style={styles.header}>
-          <GradientText />
+          <GradientText leftMargin={0} />
         </View>
         <View style={styles.carouselContainer}>
           <ScrollView
@@ -151,6 +173,12 @@ const WelcomeScreen = ({navigation}) => {
               <TouchableOpacity
                 style={styles.socialButton}
                 onPress={() => navigation.navigate('Login')}>
+                <IonIcons
+                  name="mail-open"
+                  size={20}
+                  color="#000"
+                  style={styles.icon}
+                />
                 <Text style={styles.socialButtonText}>
                   Continue with Work Email
                 </Text>

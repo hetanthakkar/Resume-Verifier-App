@@ -1,45 +1,49 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Svg, { Text, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { Text as RNText, View, Platform } from 'react-native';
+import React, {useState, useEffect, useCallback} from 'react';
+import Svg, {Text, Defs, LinearGradient, Stop} from 'react-native-svg';
+import {Text as RNText, View, Platform} from 'react-native';
 
-const GradientText = ({ 
-  text = "Resume Scan", 
+const GradientText = ({
+  text = 'Skill Verify',
   fontSize = 40,
   fontFamily = Platform.OS === 'ios' ? 'System' : 'Roboto',
   horizontalPadding = 10,
   verticalPadding = 15,
-  leftMargin = 20
+  leftMargin = 20,
 }) => {
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [dimensions, setDimensions] = useState({width: 0, height: 0});
   const [isLayoutMeasured, setIsLayoutMeasured] = useState(false);
 
-  const measureText = useCallback((event) => {
-    const { width, height } = event.nativeEvent.layout;
-    const adjustedWidth = Math.ceil(width + horizontalPadding * 2);
-    const adjustedHeight = Math.ceil(height + verticalPadding * 2);
+  const measureText = useCallback(
+    event => {
+      const {width, height} = event.nativeEvent.layout;
+      const adjustedWidth = Math.ceil(width + horizontalPadding * 2);
+      const adjustedHeight = Math.ceil(height + verticalPadding * 2);
 
-    if (
-      dimensions.width !== adjustedWidth ||
-      dimensions.height !== adjustedHeight
-    ) {
-      setDimensions({
-        width: adjustedWidth,
-        height: adjustedHeight,
-      });
-      setIsLayoutMeasured(true);
-    }
-  }, [dimensions, horizontalPadding, verticalPadding]);
+      if (
+        dimensions.width !== adjustedWidth ||
+        dimensions.height !== adjustedHeight
+      ) {
+        setDimensions({
+          width: adjustedWidth,
+          height: adjustedHeight,
+        });
+        setIsLayoutMeasured(true);
+      }
+    },
+    [dimensions, horizontalPadding, verticalPadding],
+  );
 
   useEffect(() => {
     setIsLayoutMeasured(false);
   }, [text, fontSize]);
 
   return (
-    <View style={{ 
-      minHeight: fontSize + verticalPadding * 2, 
-      marginLeft: leftMargin,
-      width: dimensions.width || 'auto'
-    }}>
+    <View
+      style={{
+        minHeight: fontSize + verticalPadding * 2,
+        marginLeft: leftMargin,
+        width: dimensions.width || 'auto',
+      }}>
       <RNText
         style={{
           fontSize,
@@ -47,20 +51,18 @@ const GradientText = ({
           fontFamily,
           position: 'absolute',
           opacity: 0,
-          width: 'auto'
+          width: 'auto',
         }}
-        onLayout={measureText}
-      >
+        onLayout={measureText}>
         {text}
       </RNText>
 
       {isLayoutMeasured && (
-        <Svg 
-          height={dimensions.height} 
+        <Svg
+          height={dimensions.height}
           width={dimensions.width}
-          style={{ marginTop: -verticalPadding / 2 }}
-          preserveAspectRatio="xMinYMid meet"
-        >
+          style={{marginTop: -verticalPadding / 2}}
+          preserveAspectRatio="xMinYMid meet">
           <Defs>
             <LinearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
               <Stop offset="0%" stopColor="#34b8f5" stopOpacity="1" />
@@ -77,8 +79,7 @@ const GradientText = ({
             y={dimensions.height - verticalPadding}
             textAnchor="start"
             textLength={dimensions.width - horizontalPadding * 2}
-            lengthAdjust="spacingAndGlyphs"
-          >
+            lengthAdjust="spacingAndGlyphs">
             {text}
           </Text>
         </Svg>

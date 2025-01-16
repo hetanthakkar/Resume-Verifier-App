@@ -15,6 +15,7 @@ if linkage != nil
 end
 
 target 'resumeverifier' do
+  
   config = use_native_modules!
   pod 'PDFNet', podspec: 'https://pdftron.com/downloads/ios/react-native/latest.podspec'
   use_frameworks! :linkage => :static
