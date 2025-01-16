@@ -63,7 +63,7 @@
       </FileRef>
    </Group>
    <FileRef
-      location = "group:pdf.xcodeproj">
+      location = "group:resumeverifier.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">

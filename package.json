@@ -1,5 +1,5 @@
 {
-  "name": "pdf",
+  "name": "resumeverifier",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@pdftron/react-native-pdf": "^3.0.4-5",
+    "@resumeverifiertron/react-native-resumeverifier": "^3.0.4-5",
     "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native-clipboard/clipboard": "^1.16.1",
     "@react-native-community/masked-view": "^0.1.11",
