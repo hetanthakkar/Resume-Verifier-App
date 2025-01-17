@@ -149,11 +149,12 @@ const PdfUploadScreen: React.FC = ({route}) => {
 
           // Extract the PDF URL from the response
           const pdfUrl = resume?.pdf_file;
-          console.log('job is', job, 'data is', item);
+          console.log('job is', job, 'data is', item, pdfUrl);
           if (pdfUrl) {
             setCurrentRouteName('InnerHome');
             // Navigate to the PdfView screen with the PDF URL as a parameter
             navigation.navigate('PdfView', {
+              resume_id: resume?.id,
               uri: pdfUrl, // Pass the PDF URL here
               fileName: item?.candidate_name, // Optional: Pass candidate's name
               job: job, // Pass the job information if available
@@ -258,6 +259,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
       if (data.analysis) {
         setCurrentRouteName('InnerHome');
         navigation.navigate('PdfView', {
+          resume_id: resume?.id,
           uri: result[0].fileCopyUri,
           fileName: result[0].name,
           job: job,

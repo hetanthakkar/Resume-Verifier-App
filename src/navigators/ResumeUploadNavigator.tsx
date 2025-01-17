@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import PdfViewNavigator from '../navigators/PdfTabNavigator';
 import PdfUploadScreen from '../screens/ResumeUploadScreen';
+import NotchSafeScreen from '../../NotchSafeScreen';
 
 const Stack = createNativeStackNavigator();
 

@@ -1214,6 +1214,9 @@ PODS:
   - RNGoogleSignin (13.1.0):
     - GoogleSignIn (~> 7.1)
     - React-Core
+  - RNPdftron (3.0.4-11):
+    - PDFNet
+    - React-Core
   - RNReanimated (3.16.7):
     - DoubleConversion
     - glog
@@ -1414,6 +1417,7 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
+  - "RNPdftron (from `../node_modules/@pdftron/react-native-pdf`)"
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -1554,6 +1558,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNGoogleSignin:
     :path: "../node_modules/@react-native-google-signin/google-signin"
+  RNPdftron:
+    :path: "../node_modules/@pdftron/react-native-pdf"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -1633,6 +1639,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNGestureHandler: 53bb0877f9f6d8d5ef09bd1f9c81ec05ec6873bf
   RNGoogleSignin: 9e68b9bcc3888219357924e32ee563624745647d
+  RNPdftron: 579d49d1d48904bfed674b3d0b502c880f61a3ab
   RNReanimated: 1aa58bd51e7be452e756a4fe0697bf0311844a2f
   RNScreens: 7001fd611bd5d62f0ee30170496c01e68084a77d
   RNSVG: 7268638e737364540ff8f010afb69998f3855ecb

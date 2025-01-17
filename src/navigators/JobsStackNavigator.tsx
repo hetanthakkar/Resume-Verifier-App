@@ -1,6 +1,6 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import JobsScreen from '../screens/JobsScreen';
+import JobsScreen from '../screens/JobScreen/index';
 import CreateJobScreen from '../screens/CreateJobScreen';
 import JobTabNavigator from './JobTabNavigator';
 
@@ -20,7 +20,7 @@ const JobsStackNavigator = () => {
         options={{
           title: 'Create Job',
           headerShown: true,
-          headerBackButtonMenuEnabled: false,
+          // headerBackButtonMenuEnabled: true,
         }}
       />
       <Stack.Screen

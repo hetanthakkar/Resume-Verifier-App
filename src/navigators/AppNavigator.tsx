@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LandingScreen from '../screens/LandingScreen';
+import LandingScreen from '../screens/WelcomeScreen';
 import SignupScreen from '../screens/SignupScreen';
-import LoginScreen from '../screens/LoginScreen';
+import LoginScreen from '../screens/AuthScreen';
 import ForgetPasswordScreen from '../screens/ForgetPasswordScreen';
 import HomeTabNavigator from './HomeTabNavigator';
 

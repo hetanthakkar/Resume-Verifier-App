@@ -1,4 +1,4 @@
-import React, {useState, useContext, useCallback} from 'react';
+import React, {useState, useContext, useCallback, useEffect} from 'react';
 import {Platform, StyleSheet, View, TouchableOpacity} from 'react-native';
 import {DocumentView, Config} from '@pdftron/react-native-pdf';
 import {NavigationContext} from '@react-navigation/native';
@@ -12,43 +12,80 @@ const PdfViewScreen = ({route}) => {
   const navigation = useContext(NavigationContext);
   const {uri, jobId, resumeId} = route.params;
   const [isFavorite, setIsFavorite] = useState(false);
-
+  const checkIfShortlisted = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      const response = await fetch(
+        `${API_BASE_URL}/check_shortlisted/${route.params.job.id}/${route.params.resume_id}/`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      const data = await response.json();
+      console.log('Shortlist check response:', data);
+      if (response.ok && data.shortlisted) {
+        setIsFavorite(true);
+      }
+    } catch (error) {
+      console.error('Error checking shortlist status:', error);
+    }
+  };
+  useEffect(() => {
+    checkIfShortlisted();
+  }, [jobId, resumeId]);
   const onLeadingNavButtonPressed = useCallback(() => {
     setCurrentRouteName('other');
     navigation.goBack();
   }, [navigation]);
 
   const handleFavoritePress = useCallback(async () => {
-    try {
-      // console.log(route.params);
-      const token = await AsyncStorage.getItem('accessToken');
-      const user = await AsyncStorage.getItem('userData');
-      console.log('user', user);
-      // await fetch(`${API_BASE_URL}/recent-analyses/`, {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
-      console.log(
-        `${API_BASE_URL}/jobs/${route.params.job.id}/shortlist/${route.params.resume_id}/`,
-      );
-      const response = await fetch(
-        `${API_BASE_URL}/jobs/${route.params.job.id}/shortlist/${route.params.resume_id}/`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
+    const token = await AsyncStorage.getItem('accessToken');
+    const user = await AsyncStorage.getItem('userData');
+    if (isFavorite) {
+      try {
+        // console.log(route.params);
+
+        const response = await fetch(
+          `${API_BASE_URL}/jobs/${route.params.job.id}/unshortlist/${route.params.resume_id}/`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        },
-      );
-      console.log('response', response);
-      if (response.ok) {
-        setIsFavorite(!isFavorite);
-      } else {
-        console.error('Failed to update favorite status');
+        );
+        if (response.ok) {
+          setIsFavorite(false);
+        } else {
+          console.error('Failed to update favorite status');
+        }
+      } catch (error) {
+        console.error('Error updating favorite status:', error);
       }
-    } catch (error) {
-      console.error('Error updating favorite status:', error);
+    } else {
+      try {
+        // console.log(route.params);
+
+        const response = await fetch(
+          `${API_BASE_URL}/jobs/${route.params.job.id}/shortlist/${route.params.resume_id}/`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        if (response.ok) {
+          setIsFavorite(!isFavorite);
+        } else {
+          console.error('Failed to update favorite status');
+        }
+      } catch (error) {
+        console.error('Error updating favorite status:', error);
+      }
     }
   }, [jobId, resumeId, isFavorite]);
 

@@ -37,7 +37,7 @@ const JobTabNavigator = () => {
     return <ShortlistedPdfsScreen />;
   }
   const {id, mode, job} = route.params;
-  console.log('id', id);
+
   return (
     <>
       {currentRouteName !== 'InnerHome' && (
@@ -49,14 +49,7 @@ const JobTabNavigator = () => {
           <Text style={styles.headerTitle}>Job Details</Text>
         </View>
       )}
-      <TopTab.Navigator
-        screenOptions={{
-          tabBarStyle: styles.tabBar,
-          tabBarIndicatorStyle: styles.tabIndicator,
-          tabBarActiveTintColor: '#007AFF',
-          tabBarInactiveTintColor: '#666',
-          tabBarLabelStyle: styles.tabLabel,
-        }}>
+      <TopTab.Navigator>
         <TopTab.Screen
           name="UploadResume"
           initialParams={{id, mode, job}}

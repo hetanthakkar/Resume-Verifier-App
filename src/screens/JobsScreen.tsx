@@ -14,7 +14,10 @@ import {
   Platform,
 } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-
+const API_URL = Platform.select({
+  ios: 'http://localhost:8000',
+  android: 'http://10.0.2.2:8000', // Android emulator localhost equivalent
+});
 import Modal from 'react-native-modal';
 import {
   Svg,
@@ -25,6 +28,7 @@ import {
   Text as SvgText,
 } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {API_BASE_URL} from './JobScreen/utils/api';
 
 const {width} = Dimensions.get('window');
 const CARD_WIDTH = width - 32;
@@ -185,14 +189,11 @@ const JobCard: React.FC<JobCardProps> = ({
 const refreshAccessToken = async () => {
   try {
     const refreshToken = await AsyncStorage.getItem('refreshToken');
-    const response = await fetch(
-      'http://localhost:8000/api/auth/refresh-token/',
-      {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({refresh: refreshToken}),
-      },
-    );
+    const response = await fetch(`${API_BASE_URL}/api/auth/refresh-token/`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({refresh: refreshToken}),
+    });
 
     if (response.ok) {
       const data = await response.json();
@@ -241,11 +242,8 @@ const JobPortals: React.FC = ({navigation}) => {
   };
 
   const fetchJobs = async () => {
+    console.log('came here');
     try {
-      const API_URL = Platform.select({
-        ios: 'http://localhost:8000',
-        android: 'http://10.0.2.2:8000', // Android emulator localhost equivalent
-      });
       const response = await apiCall(`${API_URL}/api/jobs/`);
       if (response.ok) {
         const data = await response.json();

@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@resumeverifiertron/react-native-resumeverifier": "^3.0.4-5",
+    "@pdftron/react-native-pdf": "^3.0.4-11",
     "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native-clipboard/clipboard": "^1.16.1",
     "@react-native-community/masked-view": "^0.1.11",
@@ -23,7 +23,6 @@
     "@react-navigation/native-stack": "^6.11.0",
     "axios": "^1.7.9",
     "babel-preset-expo": "^11.0.13",
-    "i": "^0.3.7",
     "lottie-react-native": "^7.2.1",
     "npm": "^11.0.0",
     "react": "18.2.0",

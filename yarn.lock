@@ -1407,10 +1407,10 @@
     proc-log "^5.0.0"
     which "^5.0.0"
 
-"@pdftron/react-native-pdf@^3.0.4-5":
-  version "3.0.4-5"
-  resolved "https://registry.npmjs.org/@pdftron/react-native-pdf/-/react-native-pdf-3.0.4-5.tgz"
-  integrity sha512-W1YudBPZvk7zdAJicdyNTSSqIC3EPGJfSQDNDgpFAgUWip2heZlGjdS478FVeR61I8jq7cmKDVs08LA/QL9jzQ==
+"@pdftron/react-native-pdf@^3.0.4-11":
+  version "3.0.4-11"
+  resolved "https://registry.npmjs.org/@pdftron/react-native-pdf/-/react-native-pdf-3.0.4-11.tgz"
+  integrity sha512-T2H8+/d8ljWJZRtLMi98yqkLXML36oTiyh+Vv09iIQfogitrzX3bvIfGrvYqxBLyNOodj9HqkobcUBfB4MA+wg==
   dependencies:
     deprecated-react-native-prop-types "*"
     json "^11.0.0"

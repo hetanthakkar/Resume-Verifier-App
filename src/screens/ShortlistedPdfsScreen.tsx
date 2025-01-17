@@ -29,34 +29,92 @@ interface CandidateCardProps {
   setCurrentRouteName: any;
 }
 
-const CandidateCard: React.FC<CandidateCardProps> = ({
-  name,
-  position,
-  colors,
-  navigation,
-  setCurrentRouteName,
-}) => (
-  <TouchableOpacity
-    onPress={() => {
-      setCurrentRouteName('InnerHome');
-      navigation.navigate('PdfView');
-    }}>
-    <LinearGradient
-      colors={colors}
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 1}}
-      style={styles.candidateCard}>
-      <View style={styles.candidateInfo}>
-        <Text style={styles.candidateName}>{name}</Text>
-        <Text style={styles.candidatePosition}>{position}</Text>
-      </View>
-      <TouchableOpacity style={styles.sendEmailButton}>
-        <Text style={styles.sendEmailText}>Send Email</Text>
-      </TouchableOpacity>
-      <Ionicons name="chevron-forward" size={24} color="#FFFFFF" />
-    </LinearGradient>
-  </TouchableOpacity>
-);
+const CandidateCard: React.FC<CandidateCardProps> = item => {
+  const [jobCache, setJobCache] = useState({});
+
+  const fetchJob = async jobId => {
+    try {
+      // Check cache first
+      if (jobCache[jobId]) {
+        return jobCache[jobId];
+      }
+
+      const token = await AsyncStorage.getItem('accessToken');
+      const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const jobData = await response.json();
+
+      // Update cache
+      setJobCache(prev => ({...prev, [jobId]: jobData}));
+      return jobData;
+    } catch (error) {
+      console.error('Error fetching job:', error);
+      return null;
+    }
+  };
+  const fetchResume = async (resumeId: number) => {
+    console.log('Fetching resume:', resumeId);
+
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      const response = await fetch(`${API_BASE_URL}/resumes/${resumeId}/`, {
+        headers: {Authorization: `Bearer ${token}`},
+      });
+      console.log('Data is', response);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching resume:', error);
+      return null;
+    }
+  };
+  const handleItemPress = async item => {
+    try {
+      const jobData = await fetchJob(item.shortlist.job_id);
+      const resume = await fetchResume(item.shortlist.resume_id);
+      console.log('mister resume is', item.analysis_data);
+      if (jobData && resume) {
+        item.navigation.navigate('PdfView', {
+          uri: resume?.pdf_file,
+          fileName: item.candidate_name,
+          job: jobData,
+          analysisData: item.shortlist.analysis_data,
+          resume_id: resume?.id,
+        });
+      } else {
+        console.error('Failed to fetch job data');
+        // You might want to show an error message to the user here
+      }
+    } catch (error) {
+      console.error('Error handling item press:', error);
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        item.setCurrentRouteName('InnerHome');
+        handleItemPress(item);
+      }}>
+      <LinearGradient
+        colors={item.colors}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={styles.candidateCard}>
+        <View style={styles.candidateInfo}>
+          <Text style={styles.candidateName}>{item.candidate_name}</Text>
+        </View>
+        <TouchableOpacity style={styles.sendEmailButton}>
+          <Text style={styles.sendEmailText}>Send Email</Text>
+        </TouchableOpacity>
+        <Ionicons name="chevron-forward" size={24} color="#FFFFFF" />
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+};
 
 interface ShortlistedCandidatesProps {
   navigation: any;
@@ -68,8 +126,9 @@ const ShortlistedCandidates: React.FC<ShortlistedCandidatesProps> = ({
   const {setCurrentRouteName} = React.useContext(RouteNameContext);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [resumeId, setResumeId] = useState(null);
   const jobId = route.params?.id;
-  console.log('jobId', route, navigation);
+  console.log('hetan jobId', route.params);
 
   const fetchShortlistedCandidates = async () => {
     try {
@@ -89,6 +148,9 @@ const ShortlistedCandidates: React.FC<ShortlistedCandidatesProps> = ({
         return;
       }
       const data = await response.json();
+      console.log('shortlisted candidates are ', data);
+      setResumeId(data.resume_id);
+
       setCandidates(data);
     } catch (error) {
       console.error('Error:', error);
@@ -96,10 +158,13 @@ const ShortlistedCandidates: React.FC<ShortlistedCandidatesProps> = ({
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
-    fetchShortlistedCandidates();
-  }, [jobId]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchShortlistedCandidates(); // Fetch data when the screen is focused
+    });
+
+    return unsubscribe; // Clean up the listener on unmount
+  }, [navigation]);
 
   const gradientColors = [
     ['#FF6B6B', '#FF8E8E'],
@@ -115,6 +180,7 @@ const ShortlistedCandidates: React.FC<ShortlistedCandidatesProps> = ({
       </View>
     );
   }
+  const handleShortlist = async id => {};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -135,11 +201,13 @@ const ShortlistedCandidates: React.FC<ShortlistedCandidatesProps> = ({
         data={candidates}
         renderItem={({item, index}) => (
           <CandidateCard
+            onPress={() => handleShortlist(item.id)}
             setCurrentRouteName={setCurrentRouteName}
-            name={item.name}
-            position={item.position}
+            candidate_name={item.candidate_name}
+            position={'item.position'}
             colors={gradientColors[index % gradientColors.length]}
             navigation={navigation}
+            shortlist={item}
           />
         )}
         keyExtractor={item => item.id}

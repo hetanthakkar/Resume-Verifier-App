@@ -172,6 +172,7 @@ const JobScreen = ({navigation, route, initialData, onSave}) => {
       ]);
       return true;
     }
+    navigation.goBack();
     return false;
   }, [navigation, hasUnsavedChanges, handleSave]);
 
@@ -501,18 +502,6 @@ Recruiting Team`,
               </View>
             </>
           ) : null}
-          {isEditing && (
-            <View style={styles.buttonGroup}>
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={handleSave}
-                disabled={isLoading}>
-                <Text style={styles.buttonText}>
-                  {isLoading ? 'Saving...' : 'Save Changes'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
       </ScrollView>
     </SafeAreaView>
