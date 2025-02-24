@@ -493,11 +493,13 @@ Recruiting Team`,
                       </Text>
                     </TouchableOpacity>
                   )}
-                  <TouchableOpacity
-                    style={styles.emailButton}
-                    onPress={handleSendEmail}>
-                    <Text style={styles.buttonText}>Send Email</Text>
-                  </TouchableOpacity>
+                  {mode == 'view' && (
+                    <TouchableOpacity
+                      style={styles.emailButton}
+                      onPress={handleSendEmail}>
+                      <Text style={styles.buttonText}>Send Email</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             </>

@@ -8,6 +8,7 @@ import {
   FlatList,
   TextInput,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -31,6 +32,18 @@ interface CandidateCardProps {
 
 const CandidateCard: React.FC<CandidateCardProps> = item => {
   const [jobCache, setJobCache] = useState({});
+  const [emailTemplate, setEmailTemplate] = useState({
+    emailSubject: 'Shortlisted for Position',
+    emailBody: `Dear Candidate,
+  
+  We are pleased to inform you that you have been shortlisted for the position at our company. Your qualifications and experience have impressed our hiring team, and we would like to invite you for an interview.
+  
+  Please let us know your availability for the next week, and we will schedule the interview accordingly.
+  
+  Best regards,
+  Recruiting Team`,
+    useTemplate: true,
+  });
 
   const fetchJob = async jobId => {
     try {
@@ -71,6 +84,26 @@ const CandidateCard: React.FC<CandidateCardProps> = item => {
       return null;
     }
   };
+  const handleSendEmail = async () => {
+    const recipient = 'candidate@example.com';
+    // Simplify the URL first for testing
+    const mailtoUrl = `mailto:${recipient}`;
+
+    try {
+      console.log('Testing mailto URL:', mailtoUrl);
+      const canOpen = await Linking.canOpenURL(mailtoUrl);
+      console.log('Can open mailto:', canOpen);
+
+      if (canOpen) {
+        await Linking.openURL(mailtoUrl);
+      } else {
+        console.log('No email app available');
+        // Maybe show an alert here
+      }
+    } catch (error) {
+      console.error('Email error:', error);
+    }
+  };
   const handleItemPress = async item => {
     try {
       const jobData = await fetchJob(item.shortlist.job_id);
@@ -107,7 +140,9 @@ const CandidateCard: React.FC<CandidateCardProps> = item => {
         <View style={styles.candidateInfo}>
           <Text style={styles.candidateName}>{item.candidate_name}</Text>
         </View>
-        <TouchableOpacity style={styles.sendEmailButton}>
+        <TouchableOpacity
+          style={styles.sendEmailButton}
+          onPress={handleSendEmail}>
           <Text style={styles.sendEmailText}>Send Email</Text>
         </TouchableOpacity>
         <Ionicons name="chevron-forward" size={24} color="#FFFFFF" />
@@ -127,6 +162,7 @@ const ShortlistedCandidates: React.FC<ShortlistedCandidatesProps> = ({
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [resumeId, setResumeId] = useState(null);
+
   const jobId = route.params?.id;
   console.log('hetan jobId', route.params);
 

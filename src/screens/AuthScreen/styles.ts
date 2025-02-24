@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
     height: width * 0.7,
   },
   form: {
-    flex: 1,
     marginTop: 20,
   },
   inputContainer: {

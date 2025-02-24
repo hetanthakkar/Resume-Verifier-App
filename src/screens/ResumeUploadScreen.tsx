@@ -259,7 +259,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
       if (data.analysis) {
         setCurrentRouteName('InnerHome');
         navigation.navigate('PdfView', {
-          resume_id: resume?.id,
+          resume_id: data?.resume_id,
           uri: result[0].fileCopyUri,
           fileName: result[0].name,
           job: job,
@@ -304,10 +304,6 @@ const PdfUploadScreen: React.FC = ({route}) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Animated.View style={{transform: [{rotate: spin}]}}>
-            <Icon name="sync" size={50} color="#007AFF" />
-          </Animated.View>
-
           <View style={styles.loadingMessages}>
             {loadingSteps.map((step, index) => (
               <LoadingMessage

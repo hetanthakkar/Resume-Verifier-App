@@ -12,7 +12,7 @@ export const Header = ({navigation}) => (
       <IonIcons name="chevron-back" size={24} color="#000" />
     </TouchableOpacity>
     <View style={styles.titleContainer}>
-      <GradientText text={'Welcome to Resume Scan'} fontSize={24} />
+      <GradientText text={'Welcome to Skill Verify'} fontSize={24} />
     </View>
   </View>
 );
