@@ -17,7 +17,6 @@ import {LottieSection} from './components/LottieSection';
 
 const LoginScreen = ({route, navigation}) => {
   const {state, handlers, animations, refs} = useLoginScreen(route, navigation);
-  console.log('refs are', refs);
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView

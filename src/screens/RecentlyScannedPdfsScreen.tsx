@@ -8,19 +8,40 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  Alert,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RouteNameContext} from '../../App';
-import {previousChats} from '../static_data/data';
+import {chatAPI} from '../services/api';
+
+interface User {
+  username: string;
+  problem?: {
+    description: string;
+  };
+}
+
+interface Chat {
+  id: number;
+  other_user: User;
+  last_message: string;
+  created_at: string;
+  unread_count: number;
+}
+
+interface RouteNameContextType {
+  currentRouteName: string;
+  setCurrentRouteName: (name: string) => void;
+}
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
 const PreviousChatsScreen = ({navigation, route}) => {
-  const {setCurrentRouteName} = React.useContext(RouteNameContext);
-  const [chats, setChats] = useState([]);
+  const {setCurrentRouteName} = React.useContext(RouteNameContext) as RouteNameContextType;
+  const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -37,29 +58,40 @@ const PreviousChatsScreen = ({navigation, route}) => {
 
   const fetchChats = async () => {
     try {
-      // In a real app, we would fetch chats from an API
-      // For now, we'll use our static data
-      setChats(previousChats);
-      
-      // Simulate API loading
-      setTimeout(() => {
-        setLoading(false);
-      }, 800);
+      setLoading(true);
+      const response = await chatAPI.getChats();
+      setChats(response);
     } catch (error) {
       console.error('Error fetching chats:', error);
+      if (error.response?.status === 401) {
+        // Handle unauthorized error
+        Alert.alert(
+          'Session Expired',
+          'Please log in again to continue.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('Login')
+            }
+          ]
+        );
+      } else {
+        Alert.alert('Error', 'Failed to load chats. Please try again later.');
+      }
+    } finally {
       setLoading(false);
     }
   };
 
   const handleItemPress = (chat) => {
-    // Navigate to the chat screen
     setCurrentRouteName('InnerHome');
     navigation.navigate('ChatScreen', {
       chatId: chat.id,
-      userName: chat.userName,
-      challenge: chat.challenge,
+      userName: chat.other_user.username,
+      challenge: chat.other_user.problem?.description || 'No description available',
     });
   };
+
   // Generate initials from name
   const getInitials = (name) => {
     const nameParts = name.split(' ');
@@ -70,96 +102,49 @@ const PreviousChatsScreen = ({navigation, route}) => {
     }
   };
 
-  // Function to highlight matching text
-  const HighlightText = ({ text, searchTerm, style }) => {
-    if (!searchTerm.trim()) {
-      return <Text style={style}>{text}</Text>;
-    }
-    
-    const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
-    return (
-      <Text style={style}>
-        {parts.map((part, i) => 
-          part.toLowerCase() === searchTerm.toLowerCase() ? 
-            <Text key={i} style={[style, styles.highlightedText]}>{part}</Text> : 
-            part
-        )}
-      </Text>
-    );
-  };
-
-  // Chat item component
-  const ChatItem = ({item, index}) => {
-    const date = new Date(item.timestamp);
-    const formattedDate = date.toLocaleDateString();
-    const initials = getInitials(item.userName);
-    const query = searchQuery.trim();
-    
-    return (
-      <TouchableOpacity
-        onPress={() => handleItemPress(item)}
-        style={styles.itemContainer}>
-        <LinearGradient
-          colors={gradientColors[index % gradientColors.length]}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
-          style={styles.item}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>{initials}</Text>
-          </View>
-          <View style={styles.textContainer}>
-            <HighlightText 
-              text={item.userName}
-              searchTerm={query}
-              style={styles.name}
-            />
-            <HighlightText 
-              text={item.lastMessage}
-              searchTerm={query}
-              style={[styles.jobTitle, { numberOfLines: 1, ellipsizeMode: 'tail' }]}
-            />
-            <View style={styles.topicContainer}>
-              <Text style={styles.topicLabel}>Topic: </Text>
-              <HighlightText 
-                text={item.challenge}
-                searchTerm={query}
-                style={styles.challenge}
-              />
-            </View>
-          </View>
-          {item.unread > 0 && (
-            <View style={styles.unreadBadge}>
-              <Text style={styles.unreadText}>{item.unread}</Text>
-            </View>
-          )}
-          <Feather name="chevron-right" size={24} color="#FFFFFF" />
-        </LinearGradient>
-      </TouchableOpacity>
-    );
-  };
-
   // Filter chats based on search query
   const filteredChats = chats.filter(chat => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
-    
-    // Search in user name
-    if (chat.userName?.toLowerCase().includes(query)) return true;
-    
-    // Search in challenge/topic
-    if (chat.challenge?.toLowerCase().includes(query)) return true;
-    
+
+    // Search in username
+    if (chat.other_user.username?.toLowerCase().includes(query)) return true;
+
     // Search in last message
-    if (chat.lastMessage?.toLowerCase().includes(query)) return true;
-    
+    if (chat.last_message?.toLowerCase().includes(query)) return true;
+
     return false;
   });
-  
-  const renderItem = ({item, index}) => {
-    return (
-      <ChatItem item={item} index={index} />
-    );
-  };
+
+  const renderItem = ({item, index}) => (
+    <TouchableOpacity
+      style={styles.chatItem}
+      onPress={() => handleItemPress(item)}>
+      <LinearGradient
+        colors={gradientColors[index % gradientColors.length]}
+        style={styles.gradientContainer}>
+        <View style={styles.avatarContainer}>
+          <Text style={styles.avatarText}>
+            {getInitials(item.other_user.username)}
+          </Text>
+        </View>
+        <View style={styles.chatInfo}>
+          <Text style={styles.userName}>{item.other_user.username}</Text>
+          <Text style={styles.lastMessage} numberOfLines={1}>
+            {item.last_message}
+          </Text>
+          <Text style={styles.timestamp}>
+            {new Date(item.created_at).toLocaleDateString()}
+          </Text>
+        </View>
+        {item.unread_count > 0 && (
+          <View style={styles.unreadBadge}>
+            <Text style={styles.unreadText}>{item.unread_count}</Text>
+          </View>
+        )}
+      </LinearGradient>
+    </TouchableOpacity>
+  );
 
   if (loading) {
     return (
@@ -231,12 +216,12 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: 24,
   },
-  itemContainer: {
+  chatItem: {
     marginBottom: 16,
     borderRadius: 12,
     overflow: 'hidden',
   },
-  item: {
+  gradientContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
@@ -255,37 +240,23 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  textContainer: {
+  chatInfo: {
     flex: 1,
   },
-  name: {
+  userName: {
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
   },
-  jobTitle: {
+  lastMessage: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
     marginTop: 4,
   },
-  topicContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  topicLabel: {
+  timestamp: {
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.7)',
     fontStyle: 'italic',
-  },
-  challenge: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontStyle: 'italic',
-  },
-  highlightedText: {
-    backgroundColor: 'rgba(255, 255, 0, 0.3)',
-    fontWeight: 'bold',
   },
   unreadBadge: {
     backgroundColor: '#FF3B30',

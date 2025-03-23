@@ -42,8 +42,8 @@ const GoogleAuth = () => {
       const {refresh, access, user, is_new_user} = response.data;
       console.log('google response', response.data);
       user.accessToken = access;
-      await AsyncStorage.setItem('accessToken', access);
-      await AsyncStorage.setItem('refreshToken', refresh);
+      await AsyncStorage.setItem('access_token', access);
+      await AsyncStorage.setItem('refresh_token', refresh);
       await AsyncStorage.setItem('userData', JSON.stringify(user));
       // Store the tokens (using your preferred storage method)
       // For example: AsyncStorage.setItem('tokens', JSON.stringify({ refresh, access }));

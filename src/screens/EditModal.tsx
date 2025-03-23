@@ -10,6 +10,7 @@ import {
   Alert,
   Modal,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -36,7 +37,7 @@ interface EditModalProps {
   onSave: (value: string) => void;
   value: string;
   title: string;
-  field: 'name' | 'company' | 'email';
+  field: 'name' | 'company' | 'email' | 'problem';
 }
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -51,75 +52,110 @@ const EditModal: React.FC<EditModalProps> = ({
   const [newValue, setNewValue] = useState(value);
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setNewValue(value);
     setOtp('');
     setOtpSent(false);
+    setLoading(false);
   }, [visible, value]);
 
   const handleSave = async () => {
-    const token = await AsyncStorage.getItem('accessToken');
+    try {
+      setLoading(true);
+      
+      if (field === 'problem' && !newValue.trim()) {
+        Alert.alert('Error', 'Problem description cannot be empty');
+        return;
+      }
 
-    if (field === 'email') {
-      if (!otpSent) {
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/profile/update-email/request/`,
-            {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json', // Add this header
+      const token = await AsyncStorage.getItem('access_token');
+      if (!token) {
+        Alert.alert('Error', 'You need to be logged in');
+        return;
+      }
+
+      if (field === 'email') {
+        if (!otpSent) {
+          try {
+            const response = await fetch(
+              `${API_BASE_URL}/profile/update-email/request/`,
+              {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: newValue }),
               },
-              body: JSON.stringify({new_email: newValue}), // Ensure newValue is defined
-            },
-          );
-
-          if (response.ok) {
-            setOtpSent(true);
-          } else {
-            const data = await response.json();
-            Alert.alert(
-              'Error',
-              data.message || 'Failed to send verification code',
             );
+
+            const data = await response.json();
+            
+            if (response.ok) {
+              setOtpSent(true);
+              Alert.alert('Success', data.message || 'Verification code sent to your new email');
+            } else {
+              Alert.alert(
+                'Error',
+                typeof data.error === 'string' 
+                  ? data.error 
+                  : 'Failed to send verification code',
+              );
+            }
+          } catch (error) {
+            console.error('Error sending verification code:', error);
+            Alert.alert('Error', 'Network error. Please try again.');
           }
-        } catch (error) {
-          Alert.alert('Error', 'Network error. Please try again.');
+        } else {
+          try {
+            const response = await fetch(
+              `${API_BASE_URL}/profile/update-email/confirm/`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  email: newValue,
+                  otp: otp,
+                }),
+              },
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+              await onSave(newValue);
+              Alert.alert('Success', data.message || 'Email updated successfully');
+              onClose();
+            } else {
+              Alert.alert(
+                'Error',
+                typeof data.error === 'string'
+                  ? data.error
+                  : 'Failed to verify code',
+              );
+            }
+          } catch (error) {
+            console.error('Error confirming email update:', error);
+            Alert.alert('Error', 'Network error. Please try again.');
+          }
         }
       } else {
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/profile/update-email/confirm/`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-                // Add your authentication header here
-              },
-              body: JSON.stringify({
-                new_email: newValue,
-                otp: otp,
-              }),
-            },
-          );
-
-          if (response.ok) {
-            onSave(newValue);
-            onClose();
-          } else {
-            const data = await response.json();
-            Alert.alert('Error', data.message || 'Failed to verify code');
-          }
-        } catch (error) {
-          Alert.alert('Error', 'Network error. Please try again.');
-        }
+        await onSave(newValue);
+        onClose();
       }
-    } else {
-      onSave(newValue);
-      onClose();
+    } catch (error) {
+      console.error('Error in handleSave:', error);
+      Alert.alert(
+        'Error',
+        'An error occurred while saving. Please try again.'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,13 +164,25 @@ const EditModal: React.FC<EditModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>{title}</Text>
-          <TextInput
-            style={styles.modalInput}
-            value={newValue}
-            onChangeText={setNewValue}
-            autoCapitalize="none"
-            keyboardType={field === 'email' ? 'email-address' : 'default'}
-          />
+          {field === 'problem' ? (
+            <TextInput
+              style={[styles.modalInput, styles.problemInput]}
+              value={newValue}
+              onChangeText={setNewValue}
+              multiline
+              numberOfLines={4}
+              placeholder="Describe your problem..."
+              textAlignVertical="top"
+            />
+          ) : (
+            <TextInput
+              style={styles.modalInput}
+              value={newValue}
+              onChangeText={setNewValue}
+              autoCapitalize="none"
+              keyboardType={field === 'email' ? 'email-address' : 'default'}
+            />
+          )}
           {field === 'email' && otpSent && (
             <TextInput
               style={styles.modalInput}
@@ -146,15 +194,28 @@ const EditModal: React.FC<EditModalProps> = ({
             />
           )}
           <View style={styles.modalButtons}>
-            <TouchableOpacity onPress={onClose} style={styles.modalButton}>
+            <TouchableOpacity 
+              onPress={onClose} 
+              style={styles.modalButton}
+              disabled={loading}
+            >
               <Text style={styles.modalButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleSave}
-              style={[styles.modalButton, styles.modalButtonPrimary]}>
-              <Text style={styles.modalButtonTextPrimary}>
-                {field === 'email' && !otpSent ? 'Send Code' : 'Save'}
-              </Text>
+              style={[
+                styles.modalButton,
+                styles.modalButtonPrimary,
+                loading && styles.modalButtonDisabled,
+              ]}
+              disabled={loading}>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Text style={styles.modalButtonTextPrimary}>
+                  {field === 'email' && !otpSent ? 'Send Code' : 'Save'}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -268,6 +329,12 @@ const extraStyles = StyleSheet.create({
   modalButtonPrimary: {
     backgroundColor: '#007AFF',
     borderRadius: 8,
+    minWidth: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalButtonDisabled: {
+    opacity: 0.5,
   },
   modalButtonText: {
     fontSize: 16,
@@ -276,6 +343,10 @@ const extraStyles = StyleSheet.create({
   modalButtonTextPrimary: {
     fontSize: 16,
     color: 'white',
+  },
+  problemInput: {
+    height: 120,
+    textAlignVertical: 'top',
   },
 });
 const styles = StyleSheet.create({

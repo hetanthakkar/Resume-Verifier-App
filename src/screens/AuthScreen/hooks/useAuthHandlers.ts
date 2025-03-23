@@ -64,7 +64,13 @@ export const useAuthHandlers = (
   };
 
   const handleSubmit = async () => {
-    if (!state.email || !state.name || !state.company || !state.selectedCategory || state.isLoading)
+    if (
+      !state.email ||
+      !state.name ||
+      !state.company ||
+      !state.selectedCategory ||
+      state.isLoading
+    )
       return;
     setState(prev => ({...prev, isLoading: true}));
 
@@ -140,10 +146,7 @@ export const useAuthHandlers = (
 
       const data = await response.json();
       if (response.ok) {
-        // Store tokens and user data
-        await AsyncStorage.setItem('accessToken', data.access);
-        await AsyncStorage.setItem('refreshToken', data.refresh);
-        await AsyncStorage.setItem('userData', JSON.stringify(data.user));
+        await saveUserData(data);
         navigation.navigate('Home');
       } else {
         Alert.alert('Error', 'Invalid OTP');
@@ -173,10 +176,10 @@ export const useAuthHandlers = (
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           email: state.email,
+          username: state.name.replace(/\s+/g, '_').toLowerCase(), // Convert name to username format
           password: state.password,
-          name: state.name,
-          company: state.company,
-          problemCategory: state.selectedCategory, // Send category to the API
+          problem_category: state.selectedCategory,
+          problem_description: state.company, // Using company field as problem description
         }),
       });
 
@@ -192,6 +195,7 @@ export const useAuthHandlers = (
         animations.animateTransition(true);
       } else {
         const data = await response.json();
+        console.log('data is', data);
         Alert.alert('Error', data.email?.[0] || 'Registration failed');
       }
     } catch (error) {
@@ -202,8 +206,8 @@ export const useAuthHandlers = (
   };
 
   const saveUserData = async data => {
-    await AsyncStorage.setItem('accessToken', data.access);
-    await AsyncStorage.setItem('refreshToken', data.refresh);
+    await AsyncStorage.setItem('access_token', data.access);
+    await AsyncStorage.setItem('refresh_token', data.refresh);
     await AsyncStorage.setItem('userData', JSON.stringify(data.user));
   };
 
@@ -231,10 +235,10 @@ export const useAuthHandlers = (
       ...prev,
       company: text,
       // Show category picker after user enters description
-      showCategory: text.length > 0
+      showCategory: text.length > 0,
     }));
   };
-  
+
   const setCategory = (categoryId: string) => {
     setState(prev => ({
       ...prev,

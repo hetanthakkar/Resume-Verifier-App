@@ -31,6 +31,11 @@ interface ProfileData {
   name: string;
   email: string;
   company: string;
+  problem?: {
+    description: string;
+    created_at: string;
+    updated_at: string;
+  };
 }
 
 const API_BASE_URL = Platform.select({
@@ -41,6 +46,11 @@ interface UserProfile {
   name: string;
   email: string;
   company: string;
+  problem?: {
+    description: string;
+    created_at: string;
+    updated_at: string;
+  };
   lastUpdated?: number;
 }
 
@@ -58,7 +68,7 @@ interface EditModalProps {
   onSave: (value: string) => void;
   value: string;
   title: string;
-  field: 'name' | 'company' | 'email';
+  field: 'name' | 'company' | 'email' | 'problem';
 }
 
 const SettingRow: React.FC<SettingRowProps> = ({
@@ -94,6 +104,11 @@ const SettingsScreen: React.FC = () => {
     name: '',
     email: '',
     company: '',
+    problem: {
+      description: '',
+      created_at: '',
+      updated_at: '',
+    },
   });
 
   const [loading, setLoading] = useState(true);
@@ -102,7 +117,7 @@ const SettingsScreen: React.FC = () => {
   // Fetch profile from API
   const fetchProfileFromAPI = async () => {
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('access_token');
       const response = await fetch(`${API_BASE_URL}/profile/`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,7 +162,7 @@ const SettingsScreen: React.FC = () => {
   ): Promise<boolean> => {
     console.log('field', field);
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('access_token');
       const response = await fetch(`${API_BASE_URL}/profile/update/`, {
         method: 'PUT',
         headers: {
@@ -178,16 +193,81 @@ const SettingsScreen: React.FC = () => {
     }
   };
 
+  const fetchProblem = async () => {
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      const response = await fetch(`${API_BASE_URL}/problem/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch problem');
+
+      const data = await response.json();
+      setProfile(prev => ({
+        ...prev,
+        problem: data,
+      }));
+    } catch (err) {
+      console.error('Error fetching problem:', err);
+    }
+  };
+
+  const updateProblem = async (description: string): Promise<boolean> => {
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      if (!token) {
+        throw new Error('No access token found');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/problem/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ description }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update problem');
+      }
+
+      const data = await response.json();
+      
+      // Update the profile state in a safe way
+      setProfile(prev => ({
+        ...prev,
+        problem: {
+          description: data.description || description,
+          created_at: data.created_at || new Date().toISOString(),
+          updated_at: data.updated_at || new Date().toISOString(),
+        }
+      }));
+      
+      return true;
+    } catch (err) {
+      console.error('Error updating problem:', err);
+      Alert.alert(
+        'Error',
+        err instanceof Error ? err.message : 'Failed to update problem'
+      );
+      return false;
+    }
+  };
+
   useEffect(() => {
     const initializeProfile = async () => {
       setLoading(true);
       await loadProfileFromStorage();
+      await fetchProblem();
 
       const storedProfile = await AsyncStorage.getItem('userData');
       const parsedProfile = storedProfile ? JSON.parse(storedProfile) : null;
       setProfile(parsedProfile);
-      console.log('Stored profile:', parsedProfile, storedProfile);
-      // Fetch from API if no stored profile or if it's stale
+
       if (
         !parsedProfile ||
         !parsedProfile.lastUpdated ||
@@ -201,13 +281,11 @@ const SettingsScreen: React.FC = () => {
 
     initializeProfile();
 
-    // Set up periodic refresh
     const refreshInterval = setInterval(fetchProfileFromAPI, REFRESH_INTERVAL);
-
     return () => clearInterval(refreshInterval);
   }, []);
   const [editField, setEditField] = useState<
-    'name' | 'company' | 'email' | null
+    'name' | 'company' | 'email' | 'problem' | null
   >(null);
   const gradientColors = [
     ['#FF6B6B', '#FF8E8E'], // Red
@@ -222,56 +300,56 @@ const SettingsScreen: React.FC = () => {
     field: keyof ProfileData,
     value: string,
   ) => {
-    const success = await updateProfile(field, value);
-    if (!success) {
-      Alert.alert('Error', 'Failed to update profile');
+    try {
+      if (field === 'problem') {
+        const success = await updateProblem(value);
+        if (!success) {
+          Alert.alert('Error', 'Failed to update problem');
+        }
+      } else {
+        const success = await updateProfile(field, value);
+        if (!success) {
+          Alert.alert('Error', 'Failed to update profile');
+        }
+      }
+    } catch (error) {
+      console.error('Error in handleUpdateProfile:', error);
+      Alert.alert(
+        'Error',
+        'An unexpected error occurred while updating the profile'
+      );
     }
   };
 
   const handleLogout = async () => {
     try {
-      setLoading(true);
       const [accessToken, refreshToken] = await Promise.all([
-        AsyncStorage.getItem('accessToken'),
-        AsyncStorage.getItem('refreshToken'),
+        AsyncStorage.getItem('access_token'),
+        AsyncStorage.getItem('refresh_token'),
       ]);
 
-      // Call logout API to blacklist the refresh token
-      const response = await fetch(`${API_BASE_URL}/auth/logout/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          refresh: refreshToken,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Logout failed');
+      if (accessToken) {
+        await fetch(`${API_BASE_URL}/auth/logout/`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
       }
 
-      // Clear all relevant storage
-      await Promise.all([
-        AsyncStorage.removeItem('accessToken'),
-        AsyncStorage.removeItem('refreshToken'),
-        AsyncStorage.removeItem(STORAGE_KEYS.USER_PROFILE),
-        AsyncStorage.removeItem('userData'),
-      ]);
-
-      // Navigate to Login screen
+      await AsyncStorage.removeItem('access_token');
+      await AsyncStorage.removeItem('refresh_token');
+      await AsyncStorage.removeItem('userData');
       navigation.reset({
         index: 0,
         routes: [{name: 'Landing'}],
       });
     } catch (error) {
-      console.error('Logout error:', error);
-      Alert.alert('Logout Error', 'Failed to logout. Please try again.', [
-        {text: 'OK'},
-      ]);
-    } finally {
-      setLoading(false);
+      console.error('Error during logout:', error);
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Landing'}],
+      });
     }
   };
 
@@ -288,11 +366,11 @@ const SettingsScreen: React.FC = () => {
           </View>
 
           <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Profile</Text>
             <SettingRow
               icon="person-outline"
-              label="Name"
+              label="Username"
               value={profile.name}
-              rightIcon="pencil-outline"
               colors={gradientColors[0]}
               onPress={() => setEditField('name')}
             />
@@ -300,17 +378,22 @@ const SettingsScreen: React.FC = () => {
               icon="mail-outline"
               label="Email"
               value={profile.email}
-              rightIcon="pencil-outline"
               colors={gradientColors[1]}
               onPress={() => setEditField('email')}
             />
             <SettingRow
-              icon="fitness-outline"
-              label="Your Current Problem"
+              icon="business-outline"
+              label="Company"
               value={profile.company}
-              rightIcon="pencil-outline"
               colors={gradientColors[2]}
               onPress={() => setEditField('company')}
+            />
+            <SettingRow
+              icon="help-circle-outline"
+              label="Problem"
+              value={profile.problem?.description || 'No problem description'}
+              colors={gradientColors[3]}
+              onPress={() => setEditField('problem')}
             />
           </View>
 
@@ -344,23 +427,34 @@ const SettingsScreen: React.FC = () => {
             label="Logout"
             colors={gradientColors[4]}
             onPress={handleLogout}
-            rightIcon="chevron-forward"
           />
         </View>
       </ScrollView>
-      {editField && (
-        <EditModal
-          visible={true}
-          onClose={() => setEditField(null)}
-          onSave={value => handleUpdateProfile(editField, value)}
-          value={profile[editField]}
-          title={editField === 'company' 
-            ? 'Edit Your Current Problem' 
-            : `Edit ${editField.charAt(0).toUpperCase() + editField.slice(1)}`
+      <EditModal
+        visible={editField !== null}
+        onClose={() => setEditField(null)}
+        onSave={(value) => {
+          if (editField) {
+            handleUpdateProfile(editField, value);
+            setEditField(null);
           }
-          field={editField}
-        />
-      )}
+        }}
+        value={
+          editField === 'problem'
+            ? profile.problem?.description || ''
+            : editField
+            ? profile[editField] || ''
+            : ''
+        }
+        title={
+          editField === 'problem'
+            ? 'Update Problem'
+            : editField
+            ? `Update ${editField.charAt(0).toUpperCase() + editField.slice(1)}`
+            : 'Update Field'
+        }
+        field={editField || 'name'}
+      />
     </SafeAreaView>
   );
 };

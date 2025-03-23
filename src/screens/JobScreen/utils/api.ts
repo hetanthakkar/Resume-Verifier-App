@@ -8,7 +8,7 @@ export const API_BASE_URL = Platform.select({
 
 export const refreshAccessToken = async () => {
   try {
-    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    const refreshToken = await AsyncStorage.getItem('refresh_token');
     const response = await fetch(`${API_BASE_URL}/api/auth/refresh-token/`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -17,7 +17,7 @@ export const refreshAccessToken = async () => {
 
     if (response.ok) {
       const data = await response.json();
-      await AsyncStorage.setItem('accessToken', data.access);
+      await AsyncStorage.setItem('access_token', data.access);
       return data.access;
     }
     return null;
@@ -27,7 +27,7 @@ export const refreshAccessToken = async () => {
 };
 
 export const apiCall = async (url: string, options = {}) => {
-  const token = await AsyncStorage.getItem('accessToken');
+  const token = await AsyncStorage.getItem('access_token');
   let response = await fetch(url, {
     ...options,
     headers: {

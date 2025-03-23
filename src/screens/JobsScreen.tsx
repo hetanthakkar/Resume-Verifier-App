@@ -207,7 +207,7 @@ const refreshAccessToken = async () => {
 };
 
 const apiCall = async (url: string, options = {}) => {
-  const token = await AsyncStorage.getItem('accessToken');
+  const token = await AsyncStorage.getItem('access_token');
   let response = await fetch(url, {
     ...options,
     headers: {

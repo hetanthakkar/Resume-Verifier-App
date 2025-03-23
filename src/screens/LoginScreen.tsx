@@ -251,23 +251,36 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
     setIsLoading(true);
 
     try {
+      console.log('Attempting login with:', { email });
       const response = await fetch(`${API_URL}/api/auth/login/`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({email, password}),
       });
 
+      console.log('Login response status:', response.status);
       const data = await response.json();
+      console.log('Login response data:', data);
+
       if (response.ok) {
-        await AsyncStorage.setItem('accessToken', data.access);
-        await AsyncStorage.setItem('refreshToken', data.refresh);
+        console.log('Login successful, storing tokens');
+        // Store tokens with the correct keys
+        await AsyncStorage.setItem('access_token', data.access_token || data.access);
+        await AsyncStorage.setItem('refresh_token', data.refresh_token || data.refresh);
         await AsyncStorage.setItem('userData', JSON.stringify(data.user));
+        console.log('Tokens stored successfully');
+        
+        // Verify token was stored
+        const storedToken = await AsyncStorage.getItem('access_token');
+        console.log('Stored token:', storedToken ? 'Token exists' : 'No token found');
+        
         navigation.navigate('Home');
       } else {
-        Alert.alert('Error', 'Invalid credentials');
+        console.log('Login failed:', data);
+        Alert.alert('Error', data.error || 'Invalid credentials');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Login error:', error);
       Alert.alert('Error', 'Login failed');
     } finally {
       setIsLoading(false);
@@ -291,8 +304,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
       const data = await response.json();
       if (response.ok) {
         // Store tokens and user data
-        await AsyncStorage.setItem('accessToken', data.access);
-        await AsyncStorage.setItem('refreshToken', data.refresh);
+        await AsyncStorage.setItem('access_token', data.access);
+        await AsyncStorage.setItem('refresh_token', data.refresh);
         await AsyncStorage.setItem('userData', JSON.stringify(data.user));
         navigation.navigate('Home');
       } else {

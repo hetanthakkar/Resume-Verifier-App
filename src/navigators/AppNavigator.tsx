@@ -49,21 +49,24 @@ const AppNavigator = () => {
 
       if (response.ok) {
         const data = await response.json();
-        await AsyncStorage.setItem('accessToken', data.access);
+        await AsyncStorage.setItem('access_token', data.access);
         if (data.refresh) {
-          await AsyncStorage.setItem('refreshToken', data.refresh);
+          await AsyncStorage.setItem('refresh_token', data.refresh);
         }
+        return data.access;
       }
+      return null;
     } catch (error) {
       console.error('Token refresh failed:', error);
+      return null;
     }
   };
 
   const checkAuthStatus = async () => {
     try {
       const [accessToken, refreshToken] = await Promise.all([
-        AsyncStorage.getItem('accessToken'),
-        AsyncStorage.getItem('refreshToken'),
+        AsyncStorage.getItem('access_token'),
+        AsyncStorage.getItem('refresh_token'),
       ]);
 
       if (accessToken) {

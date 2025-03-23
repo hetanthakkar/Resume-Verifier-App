@@ -34,7 +34,7 @@ const JobScreen = ({navigation, route, initialData, onSave}) => {
   const fetchJobDetails = async () => {
     setIsLoading(true);
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('access_token');
       const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -66,7 +66,7 @@ const JobScreen = ({navigation, route, initialData, onSave}) => {
 
     setIsLoading(true);
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('access_token');
       const body = JSON.stringify(job);
 
       const curlCommand = `
@@ -206,7 +206,7 @@ Recruiting Team`,
 
     setIsLoading(true);
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('access_token');
       const response = await fetch(`${API_BASE_URL}/jobs/`, {
         method: 'POST',
         headers: {

@@ -4,7 +4,7 @@ import {API_BASE_URL} from '../../JobScreen/utils/api';
 
 export const jobService = {
   async fetchJob(jobId) {
-    const token = await AsyncStorage.getItem('accessToken');
+    const token = await AsyncStorage.getItem('access_token');
     const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/`, {
       headers: {Authorization: `Bearer ${token}`},
     });
@@ -14,7 +14,7 @@ export const jobService = {
   },
 
   async createJob(jobUrl) {
-    const token = await AsyncStorage.getItem('accessToken');
+    const token = await AsyncStorage.getItem('access_token');
     const response = await fetch(`${API_BASE_URL}/jobs/`, {
       method: 'POST',
       headers: {
@@ -29,7 +29,7 @@ export const jobService = {
   },
 
   async updateJob(job) {
-    const token = await AsyncStorage.getItem('accessToken');
+    const token = await AsyncStorage.getItem('access_token');
     const response = await fetch(`${API_BASE_URL}/jobs/${job.id}/`, {
       method: 'PUT',
       headers: {

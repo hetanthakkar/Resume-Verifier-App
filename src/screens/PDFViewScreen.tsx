@@ -42,12 +42,10 @@ const PdfViewScreen = ({route}) => {
   }, [navigation]);
 
   const handleFavoritePress = useCallback(async () => {
-    const token = await AsyncStorage.getItem('accessToken');
+    const token = await AsyncStorage.getItem('access_token');
     const user = await AsyncStorage.getItem('userData');
     if (isFavorite) {
       try {
-        // console.log(route.params);
-
         const response = await fetch(
           `${API_BASE_URL}/jobs/${route.params.job.id}/unshortlist/${route.params.resume_id}/`,
           {
@@ -67,8 +65,6 @@ const PdfViewScreen = ({route}) => {
       }
     } else {
       try {
-        // console.log(route.params);
-
         const response = await fetch(
           `${API_BASE_URL}/jobs/${route.params.job.id}/shortlist/${route.params.resume_id}/`,
           {

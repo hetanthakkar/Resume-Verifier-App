@@ -111,7 +111,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
     console.log('Fetching resume:', resumeId);
 
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('access_token');
       const response = await fetch(`${API_BASE_URL}/resumes/${resumeId}/`, {
         headers: {Authorization: `Bearer ${token}`},
       });
@@ -126,7 +126,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
   };
   const fetchRecentScans = async () => {
     try {
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('access_token');
       const response = await fetch(`${API_BASE_URL}/job-analyses/${job.id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -220,7 +220,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
     try {
       const result = await DocumentPicker.pick({
         type: [DocumentPicker.types.pdf],
-        copyTo: 'cachesDirectory', // This ensures we get a proper file path
+        copyTo: 'cachesDirectory',
       });
 
       if (!result[0].fileCopyUri) {
@@ -228,7 +228,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
       }
       setIsAnalyzing(true);
       setIsUploading(true);
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('access_token');
       const formData = new FormData();
       formData.append('job_id', job.id);
       formData.append('pdf_file', {
@@ -240,7 +240,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
         name: result[0].name || 'upload.pdf',
       });
 
-      formData.append('job_id', route.params.id); // Hardcoded job_id as requested
+      formData.append('job_id', route.params.id);
       console.log('formData', formData);
       const response = await fetch(
         `${API_BASE_URL}/resume-analysis/?job_id=1`,
@@ -255,7 +255,6 @@ const PdfUploadScreen: React.FC = ({route}) => {
       );
       const data = await response.json();
       console.log('Data is', data);
-      // Replace navigation code with this
       if (data.analysis) {
         setCurrentRouteName('InnerHome');
         navigation.navigate('PdfView', {
@@ -268,7 +267,6 @@ const PdfUploadScreen: React.FC = ({route}) => {
       } else {
         throw new Error('Missing analysis data in response');
       }
-      //   setUploadedFiles(prev => [...prev, result[0]]);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         console.log('User cancelled the upload');

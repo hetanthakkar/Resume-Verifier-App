@@ -14,27 +14,71 @@ import {styles} from './styles';
 import JobCard from './components/JobCard/index';
 import EmptyState from './components/EmptyState';
 import {GRADIENT_COLORS} from './constants/theme';
-import {mentalHealthMatches} from '../../static_data/data';
+import {matchAPI} from '../../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {apiCall, API_BASE_URL} from './utils/api';
+interface Match {
+  id: number;
+  name: string;
+  challenge: string;
+  age: string;
+  similarity: number;
+  lastActive: string;
+}
+
+interface APIResponse {
+  id: number;
+  matched_user: {
+    username: string;
+    problem?: {
+      description: string;
+    };
+    date_of_birth?: string;
+  };
+  similarity_score: number;
+  last_interaction: string;
+}
 
 const PotentialMatches = ({navigation}) => {
-  const [matches, setMatches] = useState([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchMatches = async () => {
     try {
-      // In a real app, we would fetch matches from an API
-      // For now, we'll use our static data
-      setMatches(mentalHealthMatches);
+      setLoading(true);
+      // Get the access token from AsyncStorage
+      const accessToken = await AsyncStorage.getItem('access_token');
+      if (!accessToken) {
+        Alert.alert('Error', 'Please login again');
+        navigation.navigate('Login');
+        return;
+      }
 
-      // Simulate API loading
-      setTimeout(() => {
-        setLoading(false);
-      }, 800);
+      const response: APIResponse[] = await matchAPI.getMatches();
+      
+      // Transform the API response to match our UI format
+      const transformedMatches: Match[] = response.map(match => ({
+        id: match.id,
+        name: match.matched_user.username || `Anonymous User ${match.id}`,
+        challenge: match.matched_user.problem?.description || 'No description available',
+        age: match.matched_user.date_of_birth ? 
+          `${new Date().getFullYear() - new Date(match.matched_user.date_of_birth).getFullYear()}` : 
+          'Not specified',
+        similarity: Math.round(match.similarity_score * 100),
+        lastActive: new Date(match.last_interaction).toLocaleDateString(),
+      }));
+      
+      setMatches(transformedMatches);
     } catch (error) {
-      Alert.alert('Error', 'Failed to load potential matches');
+      console.error('Error fetching matches:', error);
+      if (error.response?.status === 401) {
+        Alert.alert('Session Expired', 'Please login again');
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Error', 'Failed to load potential matches');
+      }
+    } finally {
       setLoading(false);
     }
   };
@@ -125,17 +169,11 @@ const PotentialMatches = ({navigation}) => {
               }}
               gradientColors={GRADIENT_COLORS[index % GRADIENT_COLORS.length]}
               onPress={() => {
-                // setCurrentRouteName('InnerHome');
                 navigation.navigate('ChatScreen', {
                   chatId: item.id,
-                  userName: item.userName,
-                  // challenge: chat.challenge,
+                  userName: item.name,
+                  challenge: item.challenge,
                 });
-                // navigation.navigate('JobTab', {
-                //   id: item.id,
-                //   mode: 'view',
-                //   job: item,
-                // });
               }}
             />
           )}
