@@ -305,8 +305,8 @@ const SettingsScreen: React.FC = () => {
               onPress={() => setEditField('email')}
             />
             <SettingRow
-              icon="business-outline"
-              label="Company"
+              icon="fitness-outline"
+              label="Your Current Problem"
               value={profile.company}
               rightIcon="pencil-outline"
               colors={gradientColors[2]}
@@ -354,9 +354,10 @@ const SettingsScreen: React.FC = () => {
           onClose={() => setEditField(null)}
           onSave={value => handleUpdateProfile(editField, value)}
           value={profile[editField]}
-          title={`Edit ${
-            editField.charAt(0).toUpperCase() + editField.slice(1)
-          }`}
+          title={editField === 'company' 
+            ? 'Edit Your Current Problem' 
+            : `Edit ${editField.charAt(0).toUpperCase() + editField.slice(1)}`
+          }
           field={editField}
         />
       )}

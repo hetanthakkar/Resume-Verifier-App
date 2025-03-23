@@ -17,6 +17,8 @@ export const useLoginScreen = (route, navigation) => {
     showPassword: !isGoogleSignIn,
     showName: isGoogleSignIn,
     showCompany: isGoogleSignIn,
+    showCategory: false,
+    selectedCategory: '',
     otp: ['', '', '', '', '', ''],
     showLottie: !isGoogleSignIn,
     isOTPComplete: false,

@@ -64,7 +64,7 @@ export const useAuthHandlers = (
   };
 
   const handleSubmit = async () => {
-    if (!state.email || !state.name || !state.company || state.isLoading)
+    if (!state.email || !state.name || !state.company || !state.selectedCategory || state.isLoading)
       return;
     setState(prev => ({...prev, isLoading: true}));
 
@@ -78,6 +78,7 @@ export const useAuthHandlers = (
         body: JSON.stringify({
           name: state.name,
           company: state.company,
+          problemCategory: state.selectedCategory,
         }),
       });
 
@@ -159,6 +160,7 @@ export const useAuthHandlers = (
       !state.email ||
       !state.name ||
       !state.company ||
+      !state.selectedCategory || // Require category selection
       !state.password ||
       state.isLoading
     )
@@ -174,6 +176,7 @@ export const useAuthHandlers = (
           password: state.password,
           name: state.name,
           company: state.company,
+          problemCategory: state.selectedCategory, // Send category to the API
         }),
       });
 
@@ -227,6 +230,15 @@ export const useAuthHandlers = (
     setState(prev => ({
       ...prev,
       company: text,
+      // Show category picker after user enters description
+      showCategory: text.length > 0
+    }));
+  };
+  
+  const setCategory = (categoryId: string) => {
+    setState(prev => ({
+      ...prev,
+      selectedCategory: categoryId,
     }));
   };
 
@@ -246,6 +258,7 @@ export const useAuthHandlers = (
     handleRegister,
     setName,
     setCompany,
+    setCategory,
     setPassword,
     handleSubmitOTP,
   };

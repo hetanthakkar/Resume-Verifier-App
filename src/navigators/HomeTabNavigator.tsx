@@ -16,7 +16,7 @@ const HomeTabNavigator = () => {
 
   return (
     <BottomTab.Navigator
-    initialRouteName="Jobs"
+    initialRouteName="Potential Matches"
       activeColor="#007AFF"
       inactiveColor="#8E8E93"
       barStyle={[
@@ -27,11 +27,11 @@ const HomeTabNavigator = () => {
         tabBarIcon: ({ color }) => {
           let iconName;
           switch (route.name) {
-            case 'Jobs':
-              iconName = 'briefcase-outline';
+            case 'Potential Matches':
+              iconName = 'people-circle-outline';
               break;
-            case 'Candidates':
-              iconName = 'people-outline';
+            case 'Previous Chats':
+              iconName = 'chatbubbles-outline';
               break;
             case 'Settings':
               iconName = 'settings-outline';
@@ -46,8 +46,8 @@ const HomeTabNavigator = () => {
         tabBarInactiveTintColor: '#8E8E93',
       })}
     >
-      <BottomTab.Screen name="Jobs" component={JobsStackNavigator} />
-      <BottomTab.Screen name="Candidates" component={RecentlyScannedPdfsScreen} />
+      <BottomTab.Screen name="Potential Matches" component={JobsStackNavigator} />
+      <BottomTab.Screen name="Previous Chats" component={RecentlyScannedPdfsScreen} />
       <BottomTab.Screen name="Settings" component={SettingsScreen} />
     </BottomTab.Navigator>
   );

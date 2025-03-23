@@ -2,21 +2,21 @@ import {Platform} from 'react-native';
 
 export const carouselItems = [
   {
-    title: 'Experience Check',
-    text: 'Say goodbye to fake job stories. Our AI verifies work history and employment details to ensure authenticity in your hiring process.',
-    icon: 'git-compare-outline',
+    title: 'Share Safely',
+    text: 'Find a supportive community where you can openly discuss your mental health challenges in a completely anonymous environment.',
+    icon: 'shield-checkmark-outline',
     colors: ['#FF2D55', '#FF3B30'],
   },
   {
-    title: 'Project Check',
-    text: 'No more made-up projects. We analyze portfolio submissions and validate technical claims to give you a clear picture of real-world experience.',
-    icon: 'document-text-outline',
+    title: 'Connect & Heal',
+    text: 'Get matched with others experiencing similar mental health challenges and build meaningful connections through shared experiences.',
+    icon: 'people-outline',
     colors: ['#5856D6', '#007AFF'],
   },
   {
-    title: 'Real Coding Skills',
-    text: 'No more overhyped coding claims. Our adaptive assessments evaluate practical abilities and code quality to reveal true technical proficiency.',
-    icon: 'bar-chart-outline',
+    title: 'Grow Together',
+    text: 'Track your progress, share coping strategies, and support each other on the journey toward better mental well-being.',
+    icon: 'leaf-outline',
     colors: ['#34C759', '#30B0C7'],
   },
 ];

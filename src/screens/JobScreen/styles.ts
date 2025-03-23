@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    // marginBottom: 12,
   },
   headerTitle: {
     fontSize: 28,
@@ -99,6 +99,48 @@ export const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#666',
+    fontWeight: '600',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    borderRadius: 10,
+    marginHorizontal: 0,
+    marginVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+    padding: 0,
+    height: 36,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    paddingTop: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  clearSearchButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  clearSearchButtonText: {
+    color: 'white',
     fontWeight: '600',
   },
 });

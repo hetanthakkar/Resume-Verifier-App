@@ -9,6 +9,7 @@ export const AnimatedInput = ({
   animation,
   placeholder = '',
   editable = true,
+  multiline = false,
 }) => (
   <Animated.View
     style={[
@@ -27,12 +28,13 @@ export const AnimatedInput = ({
     ]}>
     <Text style={styles.label}>{label}</Text>
     <TextInput
-      style={styles.input}
+      style={[styles.input, multiline && {height: 100, textAlignVertical: 'top'}]}
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
       placeholderTextColor="#A0AEC0"
       editable={editable}
+      multiline={multiline}
     />
   </Animated.View>
 );

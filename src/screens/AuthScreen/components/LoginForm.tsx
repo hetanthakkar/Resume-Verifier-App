@@ -4,6 +4,7 @@ import styles from '../styles';
 import {InputField} from './Inputfield';
 import {AnimatedInput} from './AnimatedInput';
 import {PasswordInput} from './PasswordInput';
+import {CategoryPicker} from './CategoryPicker';
 
 export const LoginForm = ({state, handlers, animations, navigation}) => {
   // Calculate dynamic styles based on visible elements
@@ -21,7 +22,7 @@ export const LoginForm = ({state, handlers, animations, navigation}) => {
         label="Enter Your Email"
         value={state.email}
         onChangeText={handlers.handleEmailChange}
-        placeholder="name@company.com"
+        placeholder="your.email@example.com"
         keyboardType="email-address"
         isGoogleSignIn={state.isGoogleSignIn}
       />
@@ -35,9 +36,18 @@ export const LoginForm = ({state, handlers, animations, navigation}) => {
       )}
       {state.showCompany && (
         <AnimatedInput
-          label="Company"
+          label="Describe Your Mental Health Challenge"
           value={state.company}
           onChangeText={handlers.setCompany}
+          animation={animations.slideAnimation}
+          multiline={true}
+          placeholder="Briefly describe what you're going through..."
+        />
+      )}
+      {state.showCategory && (
+        <CategoryPicker
+          selectedCategory={state.selectedCategory}
+          onSelectCategory={handlers.setCategory}
           animation={animations.slideAnimation}
         />
       )}

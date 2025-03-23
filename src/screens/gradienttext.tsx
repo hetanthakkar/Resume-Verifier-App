@@ -3,7 +3,7 @@ import Svg, {Text, Defs, LinearGradient, Stop} from 'react-native-svg';
 import {Text as RNText, View, Platform} from 'react-native';
 
 const GradientText = ({
-  text = 'Skill Verify',
+  text = 'Heal Talk',
   fontSize = 40,
   fontFamily = Platform.OS === 'ios' ? 'System' : 'Roboto',
   horizontalPadding = 10,

@@ -1,140 +1,177 @@
-import React, {useRef} from 'react';
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  Animated,
-  Alert,
-  Dimensions,
-} from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
-
-import {
-  Svg,
-  Defs,
-  LinearGradient,
-  Stop,
-  Rect,
-  Text as SvgText,
-} from 'react-native-svg';
-import {styles} from './styles';
-import {DIMENSIONS} from '../../constants/theme';
-import {truncateText} from '../../utils/helper';
-
-interface JobCardProps {
-  job: Job;
-  gradientColors: string[];
-  onPress: () => void;
-}
-
-const JobCard: React.FC<JobCardProps> = ({job, gradientColors, onPress}) => {
-  const animatedValue = useRef(new Animated.Value(0)).current;
-
-  const handlePressIn = () => {
-    Animated.spring(animatedValue, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(animatedValue, {
-      toValue: 0,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const copyJobId = () => {
-    Clipboard.setString(job.id.toString());
-    Alert.alert('Success', 'Job ID copied to clipboard');
+import React from 'react';
+import {TouchableOpacity, Text, View, StyleSheet} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+const JobCard = ({job, gradientColors, onPress}) => {
+  // Get initials for avatar
+  const getInitials = name => {
+    const parts = name.split(' ');
+    // Handle "Anonymous User X" format
+    if (parts.length >= 3 && parts[0] === 'Anonymous' && parts[1] === 'User') {
+      return parts[2];
+    }
+    return parts.length > 1
+      ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+      : name.substring(0, 2).toUpperCase();
   };
 
   return (
     <TouchableOpacity
+      activeOpacity={0.95}
       onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      activeOpacity={0.9}>
-      <Animated.View
-        style={[
-          styles.jobCard,
-          {
-            transform: [
-              {
-                scale: animatedValue.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [1, 0.98],
-                }),
-              },
-            ],
-          },
-        ]}>
-        <Svg height={DIMENSIONS.CARD_HEIGHT} width={DIMENSIONS.CARD_WIDTH}>
-          <Defs>
-            <LinearGradient
-              id={`grad-${job.id}`}
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%">
-              <Stop offset="0%" stopColor={gradientColors[0]} stopOpacity="1" />
-              <Stop
-                offset="100%"
-                stopColor={gradientColors[1]}
-                stopOpacity="1"
-              />
-            </LinearGradient>
-          </Defs>
-          <Rect
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            fill={`url(#grad-${job.id})`}
-            rx="12"
-            ry="12"
-          />
+      style={styles.container}>
+      <LinearGradient
+        colors={gradientColors}
+        style={styles.card}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}>
+        {/* Top Section */}
+        <View style={styles.topSection}>
+          {/* Avatar */}
+          <View style={styles.avatarContainer}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{getInitials(job.title)}</Text>
+            </View>
+          </View>
 
-          {/* Title text split into multiple lines if needed */}
-          {job.title
-            .split(' ')
-            .reduce(
-              (acc: JSX.Element[], word: string, i: number, arr: string[]) => {
-                const lineLength = 20;
-                const currentLine = Math.floor(i / 4);
-                const y = DIMENSIONS.CARD_HEIGHT / 2 - 20 + currentLine * 35;
-
-                if (i % 4 === 0) {
-                  const lineText = arr.slice(i, i + 4).join(' ');
-                  acc.push(
-                    <SvgText
-                      key={i}
-                      fill="white"
-                      fontSize="28"
-                      fontWeight="bold"
-                      x={DIMENSIONS.CARD_WIDTH / 2}
-                      y={y}
-                      textAnchor="middle">
-                      {truncateText(lineText, lineLength)}
-                    </SvgText>,
-                  );
-                }
-                return acc;
-              },
-              [],
-            )}
-        </Svg>
-
-        <View style={styles.jobDetails}>
-          <Text style={styles.jobInfo} numberOfLines={1} ellipsizeMode="tail">
-            {truncateText(job.company_name, 30)}
-          </Text>
-          <TouchableOpacity onPress={copyJobId} style={styles.copyButton}>
-            <Text style={styles.copyButtonText}>Copy Job ID</Text>
-          </TouchableOpacity>
+          {/* User Info */}
+          <View style={styles.userInfo}>
+            <Text style={styles.name}>{job.title}</Text>
+            {job.age && <Text style={styles.age}>Age Range: {job.age}</Text>}
+            <View style={styles.matchContainer}>
+              <Ionicons name="heart" size={16} color="white" />
+              <Text style={styles.matchText}>{job.similarity}% Match</Text>
+            </View>
+          </View>
         </View>
-      </Animated.View>
+
+        {/* Challenge Section */}
+        <View style={styles.challengeSection}>
+          <Text style={styles.challengeLabel}>Shared Challenge:</Text>
+          <Text style={styles.challengeText} numberOfLines={3}>
+            "{job.company_name}"
+          </Text>
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <View style={styles.onlineIndicator} />
+          <Text style={styles.lastActive}>{job.lastActive}</Text>
+        </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginHorizontal: 12,
+    marginVertical: 8,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  card: {
+    width: 350,
+    borderRadius: 16,
+    overflow: 'hidden',
+    padding: 0,
+  },
+  topSection: {
+    flexDirection: 'row',
+    padding: 16,
+    paddingBottom: 12,
+    alignItems: 'center',
+  },
+  avatarContainer: {
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+    marginRight: 12,
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.4)',
+  },
+  avatarText: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  userInfo: {
+    flex: 1,
+  },
+  name: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  age: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  matchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginTop: 5,
+  },
+  matchText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginLeft: 4,
+  },
+  challengeSection: {
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    padding: 16,
+    paddingTop: 12,
+  },
+  challengeLabel: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  challengeText: {
+    color: 'white',
+    fontSize: 15,
+    lineHeight: 22,
+    fontStyle: 'italic',
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: 'rgba(0,0,0,0.15)',
+  },
+  onlineIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#4CAF50',
+    marginRight: 6,
+  },
+  lastActive: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+  },
+});
+
 export default JobCard;

@@ -7,22 +7,22 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RouteNameContext} from '../../App';
+import {previousChats} from '../static_data/data';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
-const ResumeListScreen = ({navigation, route}) => {
+const PreviousChatsScreen = ({navigation, route}) => {
   const {setCurrentRouteName} = React.useContext(RouteNameContext);
-  const [recentScans, setRecentScans] = useState([]);
+  const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [jobCache, setJobCache] = useState({});
-  const job = route.params?.job;
 
   const gradientColors = [
     ['#FF6B6B', '#FF8E8E'],
@@ -32,90 +32,69 @@ const ResumeListScreen = ({navigation, route}) => {
   ];
 
   useEffect(() => {
-    fetchRecentScans();
+    fetchChats();
   }, []);
 
-  const fetchRecentScans = async () => {
+  const fetchChats = async () => {
     try {
-      const token = await AsyncStorage.getItem('accessToken');
-      const response = await fetch(`${API_BASE_URL}/recent-analyses/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      setRecentScans(data);
+      // In a real app, we would fetch chats from an API
+      // For now, we'll use our static data
+      setChats(previousChats);
+      
+      // Simulate API loading
+      setTimeout(() => {
+        setLoading(false);
+      }, 800);
     } catch (error) {
-      return;
-    } finally {
+      console.error('Error fetching chats:', error);
       setLoading(false);
     }
   };
 
-  const fetchJob = async jobId => {
-    try {
-      // Check cache first
-      if (jobCache[jobId]) {
-        return jobCache[jobId];
-      }
-
-      const token = await AsyncStorage.getItem('accessToken');
-      const response = await fetch(`${API_BASE_URL}/jobs/${jobId}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const jobData = await response.json();
-
-      // Update cache
-      setJobCache(prev => ({...prev, [jobId]: jobData}));
-      return jobData;
-    } catch (error) {
-      console.error('Error fetching job:', error);
-      return null;
-    }
+  const handleItemPress = (chat) => {
+    // Navigate to the chat screen
+    setCurrentRouteName('InnerHome');
+    navigation.navigate('ChatScreen', {
+      chatId: chat.id,
+      userName: chat.userName,
+      challenge: chat.challenge,
+    });
   };
-  const fetchResume = async (resumeId: number) => {
-    console.log('Fetching resume:', resumeId);
-
-    try {
-      const token = await AsyncStorage.getItem('accessToken');
-      const response = await fetch(`${API_BASE_URL}/resumes/${resumeId}/`, {
-        headers: {Authorization: `Bearer ${token}`},
-      });
-      console.log('Data is', response);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error fetching resume:', error);
-      return null;
+  // Generate initials from name
+  const getInitials = (name) => {
+    const nameParts = name.split(' ');
+    if (nameParts.length === 1) {
+      return nameParts[0].substring(0, 2).toUpperCase();
+    } else {
+      return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
     }
   };
 
-  const handleItemPress = async item => {
-    try {
-      setCurrentRouteName('InnerHome');
-      const jobData = await fetchJob(item.job_id);
-      const resume = await fetchResume(item.resume_id);
-      console.log('resume is', resume);
-      if (jobData && resume) {
-        navigation.navigate('PdfView', {
-          uri: resume?.pdf_file,
-          fileName: item.candidate_name,
-          job: jobData,
-          analysisData: item.analysis_data,
-          resume_id: resume?.id,
-        });
-      } else {
-        console.error('Failed to fetch job data');
-        // You might want to show an error message to the user here
-      }
-    } catch (error) {
-      console.error('Error handling item press:', error);
+  // Function to highlight matching text
+  const HighlightText = ({ text, searchTerm, style }) => {
+    if (!searchTerm.trim()) {
+      return <Text style={style}>{text}</Text>;
     }
+    
+    const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
+    return (
+      <Text style={style}>
+        {parts.map((part, i) => 
+          part.toLowerCase() === searchTerm.toLowerCase() ? 
+            <Text key={i} style={[style, styles.highlightedText]}>{part}</Text> : 
+            part
+        )}
+      </Text>
+    );
   };
-  // Move the hooks to a separate functional component
-  const ResumeItem = ({item, index, job, navigation}) => {
+
+  // Chat item component
+  const ChatItem = ({item, index}) => {
+    const date = new Date(item.timestamp);
+    const formattedDate = date.toLocaleDateString();
+    const initials = getInitials(item.userName);
+    const query = searchQuery.trim();
+    
     return (
       <TouchableOpacity
         onPress={() => handleItemPress(item)}
@@ -125,30 +104,60 @@ const ResumeListScreen = ({navigation, route}) => {
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
           style={styles.item}>
-          <View style={styles.iconContainer}>
-            <Feather name="file-text" size={24} color="#FFFFFF" />
+          <View style={styles.avatarContainer}>
+            <Text style={styles.avatarText}>{initials}</Text>
           </View>
           <View style={styles.textContainer}>
-            <Text style={styles.name}>{item.candidate_name}</Text>
-            <Text style={styles.jobTitle}>
-              {item?.job_title || 'Not specified'}
-            </Text>
-            <Text style={styles.date}>
-              {new Date(item.analyzed_at).toLocaleDateString()}
-            </Text>
+            <HighlightText 
+              text={item.userName}
+              searchTerm={query}
+              style={styles.name}
+            />
+            <HighlightText 
+              text={item.lastMessage}
+              searchTerm={query}
+              style={[styles.jobTitle, { numberOfLines: 1, ellipsizeMode: 'tail' }]}
+            />
+            <View style={styles.topicContainer}>
+              <Text style={styles.topicLabel}>Topic: </Text>
+              <HighlightText 
+                text={item.challenge}
+                searchTerm={query}
+                style={styles.challenge}
+              />
+            </View>
           </View>
+          {item.unread > 0 && (
+            <View style={styles.unreadBadge}>
+              <Text style={styles.unreadText}>{item.unread}</Text>
+            </View>
+          )}
           <Feather name="chevron-right" size={24} color="#FFFFFF" />
         </LinearGradient>
       </TouchableOpacity>
     );
   };
 
-  const filteredScans = recentScans.filter(scan =>
-    scan.candidate_name?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  // Filter chats based on search query
+  const filteredChats = chats.filter(chat => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    
+    // Search in user name
+    if (chat.userName?.toLowerCase().includes(query)) return true;
+    
+    // Search in challenge/topic
+    if (chat.challenge?.toLowerCase().includes(query)) return true;
+    
+    // Search in last message
+    if (chat.lastMessage?.toLowerCase().includes(query)) return true;
+    
+    return false;
+  });
+  
   const renderItem = ({item, index}) => {
     return (
-      <ResumeItem item={item} index={index} job={job} navigation={navigation} />
+      <ChatItem item={item} index={index} />
     );
   };
 
@@ -162,7 +171,7 @@ const ResumeListScreen = ({navigation, route}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Recently Scanned Resumes</Text>
+      <Text style={styles.header}>Previous Conversations</Text>
       <View style={styles.searchContainer}>
         <Ionicons
           name="search"
@@ -172,22 +181,29 @@ const ResumeListScreen = ({navigation, route}) => {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search candidates..."
+          placeholder="Search name, topic or message..."
           placeholderTextColor="#999"
           value={searchQuery}
           onChangeText={setSearchQuery}
+          returnKeyType="search"
+          clearButtonMode="while-editing"
         />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={20} color="#999" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <FlatList
-        data={filteredScans}
+        data={filteredChats}
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
-            {searchQuery ? 'No matches found' : 'No recent scans available'}
+            {searchQuery ? 'No matches found' : 'No conversations yet'}
           </Text>
         }
       />
@@ -225,8 +241,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
-  iconContainer: {
+  avatarContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 16,
+  },
+  avatarText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   textContainer: {
     flex: 1,
@@ -241,10 +268,38 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.8)',
     marginTop: 4,
   },
-  date: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.6)',
+  topicContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 4,
+  },
+  topicLabel: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontStyle: 'italic',
+  },
+  challenge: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontStyle: 'italic',
+  },
+  highlightedText: {
+    backgroundColor: 'rgba(255, 255, 0, 0.3)',
+    fontWeight: 'bold',
+  },
+  unreadBadge: {
+    backgroundColor: '#FF3B30',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  unreadText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -271,4 +326,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ResumeListScreen;
+export default PreviousChatsScreen;

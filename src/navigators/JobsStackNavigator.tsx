@@ -3,6 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import JobsScreen from '../screens/JobScreen/index';
 import CreateJobScreen from '../screens/CreateJobScreen';
 import JobTabNavigator from './JobTabNavigator';
+import ChatScreen from '../screens/ChatScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,10 +24,19 @@ const JobsStackNavigator = () => {
           // headerBackButtonMenuEnabled: true,
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="JobTab"
         component={JobTabNavigator}
         options={{title: 'Job Description'}}
+      /> */}
+      <Stack.Screen
+        name="ChatScreen"
+        component={ChatScreen}
+        options={{
+          title: 'Chat',
+          headerShown: true,
+          headerBackTitleVisible: false,
+        }}
       />
     </Stack.Navigator>
   );

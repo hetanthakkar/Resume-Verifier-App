@@ -9,78 +9,63 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-import Modal from 'react-native-modal';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {styles} from './styles';
 import JobCard from './components/JobCard/index';
 import EmptyState from './components/EmptyState';
 import {GRADIENT_COLORS} from './constants/theme';
+import {mentalHealthMatches} from '../../static_data/data';
 
 import {apiCall, API_BASE_URL} from './utils/api';
 
-const JobPortals = ({navigation}) => {
-  const [jobs, setJobs] = useState([]);
+const PotentialMatches = ({navigation}) => {
+  const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isCodeModalVisible, setCodeModalVisible] = useState(false);
-  const [groupCode, setGroupCode] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleJoinGroup = () => {
-    setCodeModalVisible(true);
-  };
-
-  const fetchJobs = async () => {
+  const fetchMatches = async () => {
     try {
-      const response = await apiCall(`${API_BASE_URL}/api/jobs/`);
-      if (response.ok) {
-        const data = await response.json();
-        console.log('response is', data);
-        setJobs(data);
-      } else if (response.status === 401) {
-        navigation.navigate('Login');
-      }
+      // In a real app, we would fetch matches from an API
+      // For now, we'll use our static data
+      setMatches(mentalHealthMatches);
+
+      // Simulate API loading
+      setTimeout(() => {
+        setLoading(false);
+      }, 800);
     } catch (error) {
-      Alert.alert('Error', 'Network error');
-    } finally {
+      Alert.alert('Error', 'Failed to load potential matches');
       setLoading(false);
     }
   };
 
-  const submitGroupCode = async () => {
-    try {
-      const response = await apiCall(
-        `${API_BASE_URL}/api/jobs/${groupCode}/join/`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({code: groupCode}),
-        },
-      );
+  // Filter matches based on search query
+  const filteredMatches = matches.filter(match => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
 
-      if (response.ok) {
-        Alert.alert('Success', 'Successfully joined the group');
-        fetchJobs();
-      } else {
-        Alert.alert('Error', 'Invalid code');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to join group');
-    } finally {
-      setCodeModalVisible(false);
-      setGroupCode('');
-    }
-  };
+    // Search in name
+    if (match.name?.toLowerCase().includes(query)) return true;
+
+    // Search in challenge description
+    if (match.challenge?.toLowerCase().includes(query)) return true;
+
+    // Search in age range
+    if (match.age?.toLowerCase().includes(query)) return true;
+
+    return false;
+  });
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      fetchJobs();
+      fetchMatches();
     });
 
     return unsubscribe;
   }, [navigation]);
 
   useEffect(() => {
-    fetchJobs();
+    fetchMatches();
   }, []);
 
   if (loading) {
@@ -95,85 +80,97 @@ const JobPortals = ({navigation}) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Text style={styles.headerTitle}>Your Job Postings</Text>
-          <TouchableOpacity style={styles.refreshButton} onPress={fetchJobs}>
+          <Text style={styles.headerTitle}>Potential Matches</Text>
+          <TouchableOpacity style={styles.refreshButton} onPress={fetchMatches}>
             <Text style={styles.refreshButtonText}>↻</Text>
           </TouchableOpacity>
         </View>
-        {jobs?.length > 0 && (
-          <View style={styles.headerButtons}>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.joinButton]}
-              onPress={handleJoinGroup}>
-              <Text style={styles.actionButtonText}>Join Group</Text>
+
+        <View style={styles.searchContainer}>
+          <Ionicons
+            name="search"
+            size={20}
+            color="#999"
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by name, age or challenge..."
+            placeholderTextColor="#999"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Ionicons name="close-circle" size={20} color="#999" />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.createButton]}
-              onPress={() => navigation.navigate('CreateJob')}>
-              <Text style={styles.actionButtonText}>Create Job</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          )}
+        </View>
       </View>
 
-      {jobs.length ? (
+      {matches.length ? (
         <FlatList
-          data={jobs}
+          data={filteredMatches}
           renderItem={({item, index}) => (
             <JobCard
-              job={item}
+              job={{
+                id: item.id,
+                title: item.name,
+                company_name: item.challenge,
+                similarity: item.similarity,
+                lastActive: item.lastActive,
+                age: item.age,
+              }}
               gradientColors={GRADIENT_COLORS[index % GRADIENT_COLORS.length]}
               onPress={() => {
-                navigation.navigate('JobTab', {
-                  id: item.id,
-                  mode: 'view',
-                  job: item,
+                // setCurrentRouteName('InnerHome');
+                navigation.navigate('ChatScreen', {
+                  chatId: item.id,
+                  userName: item.userName,
+                  // challenge: chat.challenge,
                 });
+                // navigation.navigate('JobTab', {
+                //   id: item.id,
+                //   mode: 'view',
+                //   job: item,
+                // });
               }}
             />
           )}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.listContainer}
           refreshing={loading}
-          onRefresh={fetchJobs}
+          onRefresh={fetchMatches}
+          ListEmptyComponent={
+            searchQuery.trim() ? (
+              <View style={styles.emptyStateContainer}>
+                <Text style={styles.emptyStateText}>
+                  No matches found for "{searchQuery}"
+                </Text>
+                <TouchableOpacity
+                  style={styles.clearSearchButton}
+                  onPress={() => setSearchQuery('')}>
+                  <Text style={styles.clearSearchButtonText}>Clear Search</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <EmptyState
+                onCreatePress={() => navigation.navigate('CreateJob')}
+                onJoinPress={() => {}}
+              />
+            )
+          }
         />
       ) : (
         <EmptyState
           onCreatePress={() => navigation.navigate('CreateJob')}
-          onJoinPress={handleJoinGroup}
+          onJoinPress={() => {}}
         />
       )}
-
-      <Modal
-        isVisible={isCodeModalVisible}
-        onBackdropPress={() => setCodeModalVisible(false)}
-        avoidKeyboard>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Enter Group Code</Text>
-          <TextInput
-            style={styles.codeInput}
-            value={groupCode}
-            onChangeText={setGroupCode}
-            placeholder="Enter code"
-            keyboardType="number-pad"
-            autoFocus
-          />
-          <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.cancelButton]}
-              onPress={() => setCodeModalVisible(false)}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.submitButton]}
-              onPress={submitGroupCode}>
-              <Text style={styles.submitButtonText}>Join</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };
 
-export default JobPortals;
+export default PotentialMatches;
