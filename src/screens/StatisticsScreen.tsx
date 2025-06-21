@@ -126,7 +126,6 @@ const ResumeStats = ({route}) => {
 };
 
 const styles = StyleSheet.create({
-  // ... existing styles remain the same ...
   container: {
     flex: 1,
     backgroundColor: '#f5f6fa',
@@ -154,7 +153,6 @@ const styles = StyleSheet.create({
     color: '#34495e',
     marginBottom: 16,
   },
-  // New styles for job match section
   jobMatchSummary: {
     gap: 12,
   },
@@ -185,7 +183,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#7f8c8d',
   },
-  // ... rest of the existing styles ...
   statRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -249,51 +246,6 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
     width: 30,
   },
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f6fa',
-  },
-  scrollView: {
-    padding: 16,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#34495e',
-    marginBottom: 16,
-  },
-  statRow: {
-    marginBottom: 12,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#7f8c8d',
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#2c3e50',
-  },
-  statDetail: {
-    fontSize: 14,
-    color: '#7f8c8d',
-    fontStyle: 'italic',
-    marginTop: 4,
-  },
   skillRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -302,15 +254,19 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 8,
+    minHeight: 44,
   },
   skillName: {
     fontSize: 16,
     fontWeight: '500',
     color: '#2c3e50',
+    flex: 1,
+    marginRight: 8,
   },
   matchStatus: {
     fontSize: 14,
     fontWeight: '500',
+    flexShrink: 0,
   },
   matched: {
     color: '#2ecc71',

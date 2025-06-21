@@ -10,15 +10,18 @@ import {
   TextInput,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import {styles} from './styles';
-import JobCard from './components/JobCard/index';
-import EmptyState from './components/EmptyState';
-import {GRADIENT_COLORS} from './constants/theme';
+import JobCard from './JobCard';
+import EmptyState from './EmptyState';
+import {GRADIENT_COLORS, apiCall, API_BASE_URL} from './utils';
 
-import {apiCall, API_BASE_URL} from './utils/api';
+interface Job {
+  id: number;
+  title: string;
+  company_name: string;
+}
 
 const JobPortals = ({navigation}) => {
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCodeModalVisible, setCodeModalVisible] = useState(false);
   const [groupCode, setGroupCode] = useState('');
@@ -85,32 +88,107 @@ const JobPortals = ({navigation}) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
         <ActivityIndicator size="large" color="#007AFF" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <Text style={styles.headerTitle}>Your Job Postings</Text>
-          <TouchableOpacity style={styles.refreshButton} onPress={fetchJobs}>
-            <Text style={styles.refreshButtonText}>↻</Text>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#F8F9FA',
+      }}>
+      <View
+        style={{
+          padding: 16,
+          backgroundColor: '#F8F9FA',
+          borderBottomColor: '#E9ECEF',
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 12,
+          }}>
+          <Text
+            style={{
+              fontSize: 28,
+              fontWeight: 'bold',
+              color: '#2C3E50',
+            }}>
+            Your Job Postings
+          </Text>
+          <TouchableOpacity
+            style={{
+              padding: 8,
+            }}
+            onPress={fetchJobs}>
+            <Text
+              style={{
+                fontSize: 24,
+                color: '#007AFF',
+              }}>
+              ↻
+            </Text>
           </TouchableOpacity>
         </View>
         {jobs?.length > 0 && (
-          <View style={styles.headerButtons}>
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 12,
+            }}>
             <TouchableOpacity
-              style={[styles.actionButton, styles.joinButton]}
+              style={[
+                {
+                  flex: 1,
+                  paddingVertical: 12,
+                  borderRadius: 8,
+                  alignItems: 'center',
+                },
+                {
+                  backgroundColor: '#28A745',
+                },
+              ]}
               onPress={handleJoinGroup}>
-              <Text style={styles.actionButtonText}>Join Group</Text>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 16,
+                  fontWeight: '600',
+                }}>
+                Join Group
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionButton, styles.createButton]}
+              style={[
+                {
+                  flex: 1,
+                  paddingVertical: 12,
+                  borderRadius: 8,
+                  alignItems: 'center',
+                },
+                {
+                  backgroundColor: '#007AFF',
+                },
+              ]}
               onPress={() => navigation.navigate('CreateJob')}>
-              <Text style={styles.actionButtonText}>Create Job</Text>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 16,
+                  fontWeight: '600',
+                }}>
+                Create Job
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -132,8 +210,10 @@ const JobPortals = ({navigation}) => {
               }}
             />
           )}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.listContainer}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={{
+            padding: 16,
+          }}
           refreshing={loading}
           onRefresh={fetchJobs}
         />
@@ -148,26 +228,83 @@ const JobPortals = ({navigation}) => {
         isVisible={isCodeModalVisible}
         onBackdropPress={() => setCodeModalVisible(false)}
         avoidKeyboard>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Enter Group Code</Text>
+        <View
+          style={{
+            backgroundColor: 'white',
+            padding: 20,
+            borderRadius: 12,
+          }}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: 'bold',
+              marginBottom: 16,
+              textAlign: 'center',
+            }}>
+            Enter Group Code
+          </Text>
           <TextInput
-            style={styles.codeInput}
+            style={{
+              borderWidth: 1,
+              borderColor: '#E0E0E0',
+              borderRadius: 8,
+              padding: 12,
+              fontSize: 16,
+              marginBottom: 16,
+            }}
             value={groupCode}
             onChangeText={setGroupCode}
             placeholder="Enter code"
             keyboardType="number-pad"
             autoFocus
           />
-          <View style={styles.modalButtons}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              gap: 12,
+            }}>
             <TouchableOpacity
-              style={[styles.modalButton, styles.cancelButton]}
+              style={[
+                {
+                  flex: 1,
+                  padding: 12,
+                  borderRadius: 8,
+                  alignItems: 'center',
+                },
+                {
+                  backgroundColor: '#E0E0E0',
+                },
+              ]}
               onPress={() => setCodeModalVisible(false)}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text
+                style={{
+                  color: '#666',
+                  fontWeight: '600',
+                }}>
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.modalButton, styles.submitButton]}
+              style={[
+                {
+                  flex: 1,
+                  padding: 12,
+                  borderRadius: 8,
+                  alignItems: 'center',
+                },
+                {
+                  backgroundColor: '#28A745',
+                },
+              ]}
               onPress={submitGroupCode}>
-              <Text style={styles.submitButtonText}>Join</Text>
+              <Text
+                style={{
+                  color: 'white',
+                  fontWeight: '600',
+                }}>
+                Join
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

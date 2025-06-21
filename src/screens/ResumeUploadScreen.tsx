@@ -76,8 +76,11 @@ interface RecentScan {
   id: number;
   created_at: string;
   pdf_url: string;
-  name: string;
+  candidate_name: string;
   score: number;
+  resume_id: number;
+  analyzed_at: string;
+  analysis_data: any;
 }
 const PdfUploadScreen: React.FC = ({route}) => {
   const {setCurrentRouteName} = React.useContext(RouteNameContext);
@@ -95,7 +98,7 @@ const PdfUploadScreen: React.FC = ({route}) => {
   const loadingSteps = [
     'Fetching Information...',
     'Scanning GitHub projects...',
-    'Fetching GitHub data...',
+    'Fetchingy GitHub data...',
     'Comparing with resume...',
     'Scanning all experience info...',
     'Getting info from LinkedIn...',
@@ -258,9 +261,10 @@ const PdfUploadScreen: React.FC = ({route}) => {
       // Replace navigation code with this
       if (data.analysis) {
         setCurrentRouteName('InnerHome');
+        const decodedUri = decodeURIComponent(result[0].fileCopyUri || '');
         navigation.navigate('PdfView', {
           resume_id: data?.resume_id,
-          uri: result[0].fileCopyUri,
+          uri: decodedUri,
           fileName: result[0].name,
           job: job,
           analysisData: data.analysis,
@@ -462,24 +466,6 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontSize: 14,
     color: '#1E1E1E',
-  },
-
-  gradientCard: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  uploadText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#FFF',
-    marginTop: 12,
-  },
-  uploadSubtext: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: 4,
   },
   loadingContainer: {
     flex: 1,

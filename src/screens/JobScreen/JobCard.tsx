@@ -17,15 +17,28 @@ import {
   Rect,
   Text as SvgText,
 } from 'react-native-svg';
-import {styles} from './styles';
-import {DIMENSIONS} from '../../constants/theme';
-import {truncateText} from '../../utils/helper';
+
+interface Job {
+  id: number;
+  title: string;
+  company_name: string;
+}
 
 interface JobCardProps {
   job: Job;
   gradientColors: string[];
   onPress: () => void;
 }
+
+const {width} = Dimensions.get('window');
+const DIMENSIONS = {
+  CARD_WIDTH: width - 32,
+  CARD_HEIGHT: 220,
+};
+
+const truncateText = (text: string, maxLength: number) => {
+  return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+};
 
 const JobCard: React.FC<JobCardProps> = ({job, gradientColors, onPress}) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
@@ -57,7 +70,18 @@ const JobCard: React.FC<JobCardProps> = ({job, gradientColors, onPress}) => {
       activeOpacity={0.9}>
       <Animated.View
         style={[
-          styles.jobCard,
+          {
+            height: DIMENSIONS.CARD_HEIGHT,
+            width: DIMENSIONS.CARD_WIDTH,
+            marginBottom: 20,
+            borderRadius: 12,
+            overflow: 'hidden',
+            elevation: 5,
+            shadowColor: '#000',
+            shadowOffset: {width: 0, height: 2},
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+          },
           {
             transform: [
               {
@@ -125,16 +149,45 @@ const JobCard: React.FC<JobCardProps> = ({job, gradientColors, onPress}) => {
             )}
         </Svg>
 
-        <View style={styles.jobDetails}>
-          <Text style={styles.jobInfo} numberOfLines={1} ellipsizeMode="tail">
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            padding: 16,
+          }}>
+          <Text
+            style={{
+              fontSize: 14,
+              color: 'white',
+              fontWeight: '600',
+            }}
+            numberOfLines={1}
+            ellipsizeMode="tail">
             {truncateText(job.company_name, 30)}
           </Text>
-          <TouchableOpacity onPress={copyJobId} style={styles.copyButton}>
-            <Text style={styles.copyButtonText}>Copy Job ID</Text>
+          <TouchableOpacity
+            onPress={copyJobId}
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              paddingHorizontal: 12,
+              paddingVertical: 4,
+              borderRadius: 12,
+            }}>
+            <Text
+              style={{
+                color: '#fff',
+                fontSize: 12,
+              }}>
+              Copy Job ID
+            </Text>
           </TouchableOpacity>
         </View>
       </Animated.View>
     </TouchableOpacity>
   );
 };
-export default JobCard;
+export default JobCard; 

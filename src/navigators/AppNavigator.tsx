@@ -10,8 +10,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LandingScreen from '../screens/WelcomeScreen';
-import SignupScreen from '../screens/SignupScreen';
-import LoginScreen from '../screens/AuthScreen';
+import AuthScreen from '../screens/AuthScreen';
 import ForgetPasswordScreen from '../screens/ForgetPasswordScreen';
 import HomeTabNavigator from './HomeTabNavigator';
 
@@ -113,19 +112,10 @@ const AppNavigator = () => {
         }}
         component={LandingScreen}
       />
-      <Stack.Screen
-        name="Signup"
-        component={SignupScreen}
-        options={({navigation}) => ({
-          headerShown: true,
-          headerTitle: '',
-          headerTransparent: true,
-          headerLeft: () => <BackButton navigation={navigation} />,
-        })}
-      />
+
       <Stack.Screen
         name="Login"
-        component={LoginScreen}
+        component={AuthScreen}
         options={{
           headerShown: false,
         }}

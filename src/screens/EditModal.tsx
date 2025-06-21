@@ -1,125 +1,87 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  ScrollView,
   Alert,
   Modal,
   TextInput,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import LinearGradient from 'react-native-linear-gradient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface SettingRowProps {
-  icon: string;
-  label: string;
-  value?: string;
-  rightIcon?: string;
-  colors: string[];
-  onPress?: () => void;
-}
-
-interface ProfileData {
-  name: string;
-  email: string;
-  company: string;
-}
-
-interface EditModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onSave: (value: string) => void;
-  value: string;
-  title: string;
-  field: 'name' | 'company' | 'email';
-}
 const API_BASE_URL = 'http://localhost:8000/api';
 
-const EditModal: React.FC<EditModalProps> = ({
+interface ForgotPasswordModalProps {
+  visible: boolean;
+  onClose: () => void;
+}
+
+const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   visible,
   onClose,
-  onSave,
-  value,
-  title,
-  field,
 }) => {
-  const [newValue, setNewValue] = useState(value);
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [otpSent, setOtpSent] = useState(false);
 
-  useEffect(() => {
-    setNewValue(value);
-    setOtp('');
-    setOtpSent(false);
-  }, [visible, value]);
+  const handleRequestOTP = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/auth/forgot-password/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({email}),
+        },
+      );
 
-  const handleSave = async () => {
-    const token = await AsyncStorage.getItem('accessToken');
-
-    if (field === 'email') {
-      if (!otpSent) {
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/profile/update-email/request/`,
-            {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json', // Add this header
-              },
-              body: JSON.stringify({new_email: newValue}), // Ensure newValue is defined
-            },
-          );
-
-          if (response.ok) {
-            setOtpSent(true);
-          } else {
-            const data = await response.json();
-            Alert.alert(
-              'Error',
-              data.message || 'Failed to send verification code',
-            );
-          }
-        } catch (error) {
-          Alert.alert('Error', 'Network error. Please try again.');
-        }
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Forgot password request response:', data);
+        setOtpSent(true);
+        Alert.alert('Success', 'Verification code has been sent to your email');
       } else {
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/profile/update-email/confirm/`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-                // Add your authentication header here
-              },
-              body: JSON.stringify({
-                new_email: newValue,
-                otp: otp,
-              }),
-            },
-          );
-
-          if (response.ok) {
-            onSave(newValue);
-            onClose();
-          } else {
-            const data = await response.json();
-            Alert.alert('Error', data.message || 'Failed to verify code');
-          }
-        } catch (error) {
-          Alert.alert('Error', 'Network error. Please try again.');
-        }
+        const data = await response.json();
+        console.log('Forgot password request error:', data);
+        Alert.alert('Error', data.message || 'Failed to send verification code');
       }
-    } else {
-      onSave(newValue);
-      onClose();
+    } catch (error) {
+      Alert.alert('Error', 'Network error. Please try again.');
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/auth/reset-password/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            otp,
+            new_password: newPassword,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Password reset response:', data);
+        Alert.alert('Success', 'Password has been reset successfully');
+        onClose();
+      } else {
+        const data = await response.json();
+        console.log('Password reset error:', data);
+        Alert.alert('Error', data.message || 'Failed to reset password');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Network error. Please try again.');
     }
   };
 
@@ -127,33 +89,46 @@ const EditModal: React.FC<EditModalProps> = ({
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{title}</Text>
+          <Text style={styles.modalTitle}>Reset Password</Text>
+          
           <TextInput
             style={styles.modalInput}
-            value={newValue}
-            onChangeText={setNewValue}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Enter your email"
             autoCapitalize="none"
-            keyboardType={field === 'email' ? 'email-address' : 'default'}
+            keyboardType="email-address"
           />
-          {field === 'email' && otpSent && (
-            <TextInput
-              style={styles.modalInput}
-              value={otp}
-              onChangeText={setOtp}
-              placeholder="Enter verification code"
-              keyboardType="number-pad"
-              maxLength={6}
-            />
+
+          {otpSent && (
+            <>
+              <TextInput
+                style={styles.modalInput}
+                value={otp}
+                onChangeText={setOtp}
+                placeholder="Enter verification code"
+                keyboardType="number-pad"
+                maxLength={6}
+              />
+              <TextInput
+                style={styles.modalInput}
+                value={newPassword}
+                onChangeText={setNewPassword}
+                placeholder="Enter new password"
+                secureTextEntry
+              />
+            </>
           )}
+
           <View style={styles.modalButtons}>
             <TouchableOpacity onPress={onClose} style={styles.modalButton}>
               <Text style={styles.modalButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={handleSave}
+              onPress={otpSent ? handleResetPassword : handleRequestOTP}
               style={[styles.modalButton, styles.modalButtonPrimary]}>
               <Text style={styles.modalButtonTextPrimary}>
-                {field === 'email' && !otpSent ? 'Send Code' : 'Save'}
+                {otpSent ? 'Reset Password' : 'Send Code'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -163,73 +138,7 @@ const EditModal: React.FC<EditModalProps> = ({
   );
 };
 
-const styles1 = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  contentWrapper: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    marginTop: 10,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#007AFF',
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginLeft: 16,
-    marginBottom: 8,
-    color: '#1E1E1E',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    marginHorizontal: 16,
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  rowContent: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  rowLabel: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  rowValue: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: 4,
-  },
-  description: {
-    fontSize: 14,
-    color: '#666',
-    marginHorizontal: 16,
-    marginTop: 8,
-  },
-  logoutSection: {
-    marginTop: 'auto',
-    marginBottom: 24,
-  },
-});
-const extraStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -238,49 +147,45 @@ const extraStyles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: 'white',
-    borderRadius: 12,
     padding: 20,
-    width: '90%',
-    maxWidth: 400,
+    borderRadius: 10,
+    width: '80%',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#1E1E1E',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   modalInput: {
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 15,
   },
   modalButtons: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   modalButton: {
-    padding: 12,
-    marginLeft: 8,
+    flex: 1,
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 5,
+    backgroundColor: '#f0f0f0',
   },
   modalButtonPrimary: {
     backgroundColor: '#007AFF',
-    borderRadius: 8,
   },
   modalButtonText: {
-    fontSize: 16,
-    color: '#007AFF',
+    textAlign: 'center',
+    color: '#333',
   },
   modalButtonTextPrimary: {
-    fontSize: 16,
+    textAlign: 'center',
     color: 'white',
   },
 });
-const styles = StyleSheet.create({
-  ...styles1,
-  ...extraStyles,
-});
 
-export default EditModal;
+export default ForgotPasswordModal;

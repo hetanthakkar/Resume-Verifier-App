@@ -22,16 +22,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
   },
-  fetchButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    padding: 12,
-    justifyContent: 'center',
-  },
-  fetchButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
   loadingContainer: {
     padding: 32,
     alignItems: 'center',
@@ -62,6 +52,10 @@ const styles = StyleSheet.create({
   textArea: {
     height: 120,
     textAlignVertical: 'top',
+  },
+  readonlyInput: {
+    backgroundColor: '#f5f5f5',
+    color: '#666',
   },
   listContainer: {
     backgroundColor: '#FFFFFF',
@@ -110,6 +104,58 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  createButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  createButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  messageContainer: {
+    backgroundColor: '#DFF0D8',
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  successMessage: {
+    color: '#3C763D',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  editHeader: {
+    backgroundColor: '#F8F9FA',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#007AFF',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  editHeaderText: {
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  editButtonContainer: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  editButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
+  },
   emailSection: {
     marginTop: 24,
   },
@@ -157,76 +203,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#FFFFFF',
-  },
-  createButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  createButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  messageContainer: {
-    backgroundColor: '#DFF0D8',
-    padding: 16,
-    borderRadius: 8,
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  successMessage: {
-    color: '#3C763D',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  editHeader: {
-    backgroundColor: '#F8F9FA',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#007AFF',
-  },
-
-  readonlyInput: {
-    backgroundColor: '#f5f5f5',
-    color: '#666',
-  },
-  editButton: {
-    color: '#007AFF',
-    fontSize: 16,
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-  },
-  editHeaderText: {
-    fontSize: 20,
-    fontWeight: '600',
-  },
-  editButtonContainer: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  editButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  backButton: {
-    color: '#007AFF',
-    fontSize: 16,
-    marginLeft: 16,
   },
 });
 

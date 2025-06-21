@@ -6,7 +6,6 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
-  SafeAreaView,
   StatusBar,
   Platform,
   Alert,
@@ -16,12 +15,13 @@ import IonIcons from 'react-native-vector-icons/Ionicons';
 import GradientText from './gradienttext';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import GoogleAuth from './GoogleAuth';
+import GoogleAuth from '../hooks/GoogleAuth';
+import SafeAreaWrapper from '../components/SafeAreaWrapper';
+
 const WelcomeScreen = ({navigation}) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const scrollViewRef = useRef();
+  const scrollViewRef = useRef<ScrollView>(null);
   const carouselItems = [
     {
       title: 'Experience Check',
@@ -89,105 +89,103 @@ const WelcomeScreen = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaWrapper gradientColors={['red', 'green']}>
       <StatusBar barStyle="dark-content" />
-      <LinearGradient colors={['#FFFFFF', '#F0F0F3']} style={styles.background}>
-        <View style={styles.header}>
-          <GradientText leftMargin={0} />
+      <View style={styles.header}>
+        <GradientText leftMargin={0} />
+      </View>
+      <View style={styles.carouselContainer}>
+        <ScrollView
+          ref={scrollViewRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}>
+          {carouselItems.map((item, index) => (
+            <View key={index} style={styles.carouselItem}>
+              <LinearGradient
+                colors={item.colors}
+                style={styles.iconBackground}>
+                <IonIcons name={item.icon} size={40} color="#FFFFFF" />
+              </LinearGradient>
+              <Text style={styles.carouselTitle}>{item.title}</Text>
+              <Text style={styles.carouselText}>{item.text}</Text>
+            </View>
+          ))}
+        </ScrollView>
+        <View style={styles.pagination}>
+          {carouselItems.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.paginationDot,
+                index === activeIndex ? styles.paginationDotActive : null,
+              ]}
+            />
+          ))}
         </View>
-        <View style={styles.carouselContainer}>
-          <ScrollView
-            ref={scrollViewRef}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}>
-            {carouselItems.map((item, index) => (
-              <View key={index} style={styles.carouselItem}>
-                <LinearGradient
-                  colors={item.colors}
-                  style={styles.iconBackground}>
-                  <Ionicons name={item.icon} size={40} color="#FFFFFF" />
-                </LinearGradient>
-                <Text style={styles.carouselTitle}>{item.title}</Text>
-                <Text style={styles.carouselText}>{item.text}</Text>
-              </View>
-            ))}
-          </ScrollView>
-          <View style={styles.pagination}>
-            {carouselItems.map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.paginationDot,
-                  index === activeIndex ? styles.paginationDotActive : null,
-                ]}
+      </View>
+      <View style={styles.buttonContainer}>
+        {Platform.OS === 'ios' ? (
+          <>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => console.log('Continue with Apple')}>
+              <FontAwesome
+                name="apple"
+                size={20}
+                color="#000"
+                style={styles.icon}
               />
-            ))}
-          </View>
-        </View>
-        <View style={styles.buttonContainer}>
-          {Platform.OS === 'ios' ? (
-            <>
-              <TouchableOpacity
-                style={styles.socialButton}
-                onPress={() => console.log('Continue with Apple')}>
-                <FontAwesome
-                  name="apple"
-                  size={20}
-                  color="#000"
-                  style={styles.icon}
-                />
-                <Text style={styles.socialButtonText}>Continue with Apple</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.socialButton}
-                onPress={() => navigation.navigate('Login')}>
-                <IonIcons
-                  name="mail-open"
-                  size={20}
-                  color="#000"
-                  style={styles.icon}
-                />
-                <Text style={styles.socialButtonText}>
-                  Continue with Work Email
-                </Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <TouchableOpacity
-                style={styles.socialButton}
-                onPress={handleGoogleSignIn}>
-                <FontAwesome
-                  name="google"
-                  size={20}
-                  color="#DB4437"
-                  style={styles.icon}
-                />
-                <Text style={styles.socialButtonText}>
-                  Continue with Google
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.socialButton}
-                onPress={() => navigation.navigate('Login')}>
-                <IonIcons
-                  name="mail-open"
-                  size={20}
-                  color="#000"
-                  style={styles.icon}
-                />
-                <Text style={styles.socialButtonText}>
-                  Continue with Work Email
-                </Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-      </LinearGradient>
-    </SafeAreaView>
+              <Text style={styles.socialButtonText}>Continue with Apple</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => navigation.navigate('Login')}>
+              <IonIcons
+                name="mail-open"
+                size={20}
+                color="#000"
+                style={styles.icon}
+              />
+              <Text style={styles.socialButtonText}>
+                Continue with Work Email
+              </Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={handleGoogleSignIn}>
+              <FontAwesome
+                name="google"
+                size={20}
+                color="#DB4437"
+                style={styles.icon}
+              />
+              <Text style={styles.socialButtonText}>
+                Continue with Google
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => navigation.navigate('Login')}>
+              <IonIcons
+                name="mail-open"
+                size={20}
+                color="#000"
+                style={styles.icon}
+              />
+              <Text style={styles.socialButtonText}>
+                Continue with Work Email
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+    </SafeAreaWrapper>
   );
 };
 

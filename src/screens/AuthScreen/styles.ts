@@ -1,5 +1,5 @@
 import {Dimensions, Platform, StatusBar, StyleSheet} from 'react-native';
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -27,17 +27,6 @@ const styles = StyleSheet.create({
     padding: 8,
     marginLeft: -8,
   },
-
-  lottieContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: height * 0.3,
-    marginVertical: 20,
-  },
-  lottieAnimation: {
-    width: width * 0.7,
-    height: width * 0.7,
-  },
   form: {
     marginTop: 20,
   },
@@ -60,20 +49,18 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
     marginTop: 10,
   },
-  forgotPasswordButton: {
-    marginTop: 12,
-    alignSelf: 'flex-end',
+  switchModeButton: {
+    alignSelf: 'center',
+    padding: 12,
+    marginTop: 8,
   },
-  forgotPasswordText: {
+  switchModeText: {
     fontSize: 14,
     color: '#007AFF',
     fontWeight: '500',
   },
   otpSection: {
     marginTop: 24,
-  },
-  otpHeader: {
-    marginBottom: 24,
   },
   verifyTitle: {
     fontSize: 24,
@@ -85,6 +72,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#4A5568',
+    marginBottom: 24,
   },
   otpContainer: {
     flexDirection: 'row',
@@ -107,20 +95,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#EDF2F7',
     borderColor: '#4A5568',
   },
-  resendButton: {
-    alignSelf: 'center',
-    padding: 12,
-  },
-  resendText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#007AFF',
-  },
   bottomButtonContainer: {
     padding: 16,
     paddingBottom: Platform.OS === 'ios' ? 34 : 16,
     backgroundColor: 'white',
-    // borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#E2E8F0',
   },
   button: {
@@ -132,8 +110,8 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    backgroundColor: '#007AFF',
   },
-
   buttonGradient: {
     padding: 16,
     alignItems: 'center',
@@ -142,22 +120,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
-  },
-  headerTitle: {
-    marginLeft: 200,
-  },
-
-  titleContainer: {
-    marginLeft: -20,
-  },
-  subtitleText: {
-    fontSize: 16,
-    // color: '#666',
-    textAlign: 'center',
-    marginBottom: 32,
-    marginTop: -18,
-    fontWeight: '400',
-    letterSpacing: 0.3,
   },
 });
 

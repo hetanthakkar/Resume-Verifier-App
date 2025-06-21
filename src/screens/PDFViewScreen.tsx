@@ -1,15 +1,15 @@
 import React, {useState, useContext, useCallback, useEffect} from 'react';
 import {Platform, StyleSheet, View, TouchableOpacity} from 'react-native';
 import {DocumentView, Config} from '@pdftron/react-native-pdf';
-import {NavigationContext} from '@react-navigation/native';
+import {NavigationContext, useNavigation} from '@react-navigation/native';
 import {RouteNameContext} from '../../App';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_BASE_URL = 'http://localhost:8000/api';
 
 const PdfViewScreen = ({route}) => {
-  const {setCurrentRouteName} = React.useContext(RouteNameContext);
-  const navigation = useContext(NavigationContext);
+  const routeNameContext = React.useContext(RouteNameContext);
+  const navigation = useNavigation();
   const {uri, jobId, resumeId} = route.params;
   const [isFavorite, setIsFavorite] = useState(false);
   const checkIfShortlisted = async () => {
@@ -37,9 +37,17 @@ const PdfViewScreen = ({route}) => {
     checkIfShortlisted();
   }, [jobId, resumeId]);
   const onLeadingNavButtonPressed = useCallback(() => {
-    setCurrentRouteName('other');
-    navigation.goBack();
-  }, [navigation]);
+    if (routeNameContext) {
+      routeNameContext.setCurrentRouteName('other');
+    }
+    // Navigate back to the Jobs screen using parent navigation
+    const parentNavigation = navigation.getParent();
+    if (parentNavigation) {
+      parentNavigation.navigate('MainJob' as never);
+    } else {
+      navigation.navigate('MainJob' as never);
+    }
+  }, [routeNameContext, navigation]);
 
   const handleFavoritePress = useCallback(async () => {
     const token = await AsyncStorage.getItem('accessToken');

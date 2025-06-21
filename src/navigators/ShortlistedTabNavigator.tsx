@@ -10,20 +10,22 @@ const Stack = createNativeStackNavigator();
 const ShortlistNavigator = ({route}) => {
   const {id} = route.params; // Extract `id` from `route.params`
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen
-        initialParams={{id: id}}
-        name="Shortlisted Candidates"
-        component={ShortlistedPdfsScreen}
-      />
-      <Stack.Screen
-        name="PdfView"
-        component={PdfView}
-        options={{
-          title: 'PDF View',
-        }}
-      />
-    </Stack.Navigator>
+    <NotchSafeScreen>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen
+          initialParams={{id: id}}
+          name="Shortlisted Candidates"
+          component={ShortlistedPdfsScreen}
+        />
+        <Stack.Screen
+          name="PdfView"
+          component={PdfView}
+          options={{
+            title: 'PDF View',
+          }}
+        />
+      </Stack.Navigator>
+    </NotchSafeScreen>
   );
 };
 

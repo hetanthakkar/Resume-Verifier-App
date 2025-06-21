@@ -7,7 +7,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   ScrollView,
   Alert,
@@ -19,6 +18,8 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import EditModal from './EditModal';
+import SafeAreaWrapper from '../components/SafeAreaWrapper';
+
 interface SettingRowProps {
   icon: string;
   label: string;
@@ -279,7 +280,7 @@ const SettingsScreen: React.FC = () => {
     return <ActivityIndicator />;
   }
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaWrapper backgroundColor="#F8F9FA" showGradient={false}>
       <StatusBar barStyle="light-content" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.contentWrapper}>
@@ -360,7 +361,7 @@ const SettingsScreen: React.FC = () => {
           field={editField}
         />
       )}
-    </SafeAreaView>
+    </SafeAreaWrapper>
   );
 };
 

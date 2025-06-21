@@ -1,8 +1,40 @@
 import React from 'react';
-import {View, TouchableOpacity, Text} from 'react-native';
+import {View, TouchableOpacity, Text, ViewStyle, TextStyle, FlexAlignType} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import IonIcons from 'react-native-vector-icons/Ionicons';
-import {styles} from '../styles';
+
+const styles = {
+  buttonContainer: {
+    justifyContent: 'center' as ViewStyle['justifyContent'],
+    alignItems: 'center' as FlexAlignType,
+    paddingVertical: 20,
+  },
+  socialButton: {
+    flexDirection: 'row' as ViewStyle['flexDirection'],
+    alignItems: 'center' as FlexAlignType,
+    justifyContent: 'center' as ViewStyle['justifyContent'],
+    width: '80%',
+    padding: 15,
+    marginBottom: 15,
+    borderColor: '#E2E8F0',
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    marginTop: 15,
+  },
+  socialButtonText: {
+    fontSize: 16,
+    fontWeight: '600' as TextStyle['fontWeight'],
+    marginLeft: 10,
+  },
+  icon: {
+    marginRight: 10,
+  },
+};
 
 export const AuthButtons = ({
   platform,
@@ -39,4 +71,4 @@ export const AuthButtons = ({
       <Text style={styles.socialButtonText}>Continue with Work Email</Text>
     </TouchableOpacity>
   </View>
-);
+); 

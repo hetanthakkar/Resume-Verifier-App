@@ -1,16 +1,15 @@
 import React, {useState, useRef} from 'react';
-import {SafeAreaView, Platform} from 'react-native';
-import {styles} from './styles';
-import {Carousel} from './components/Carousel';
-import {AuthButtons} from './components/AuthButtons';
-import {Background} from './components/Background';
-import {Header} from './components/Header';
+import {SafeAreaView, Platform, ScrollView} from 'react-native';
+import {Carousel} from './Carousel';
+import {AuthButtons} from './AuthButtons';
+import {Background} from './Background';
+import {Header} from './Header';
 import {useGoogleAuth} from '../../hooks/useGoogleAuth';
 import {carouselItems} from '../../utils/constants';
 
 const WelcomeScreen = ({navigation}) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const scrollViewRef = useRef();
+  const scrollViewRef = useRef<ScrollView | null>(null);
   const {handleGoogleSignIn} = useGoogleAuth(navigation);
 
   const handleScroll = event => {
@@ -20,7 +19,7 @@ const WelcomeScreen = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{flex: 1}}>
       <Background>
         <Header />
         <Carousel

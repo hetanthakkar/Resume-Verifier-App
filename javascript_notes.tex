@@ -1,0 +1,590 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+
+\geometry{a4paper, margin=1in}
+
+\lstset{
+    language=JavaScript,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green!60!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=5pt,
+    frame=single,
+    breaklines=true,
+    breakatwhitespace=true,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    captionpos=b,
+    backgroundcolor=\color{gray!10},
+    escapeinside={(*@}{@*)}
+}
+
+\title{JavaScript Interview Notes}
+\author{Interview Preparation}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Core JavaScript Concepts}
+
+\subsection{Type System and Equality}
+\begin{itemize}
+    \item \textbf{Falsy Values}: false, 0, -0, "", null, undefined, NaN
+    \item \textbf{Equality Operators}:
+    \begin{itemize}
+        \item \texttt{===} (strict equality): No type coercion
+        \item \texttt{==} (loose equality): Performs type coercion
+    \end{itemize}
+    \item \textbf{Type Coercion Examples}:
+    \begin{lstlisting}
+console.log(5 == "5");    // true (coerces "5" to 5)
+console.log(5 === "5");   // false (strict equality)
+console.log(null == undefined);  // true
+console.log(null === undefined); // false
+    \end{lstlisting}
+\end{itemize}
+
+\subsection{Math Operations}
+\begin{itemize}
+    \item \textbf{Basic Math}:
+    \begin{lstlisting}
+Math.floor(4.3);    // 4
+Math.ceil(3.5);     // 4
+Math.sqrt(4.2);     // 2.049...
+Math.pow(2, 10);    // 1024
+Math.max(1, 3);     // 3
+Math.min(1, 3);     // 1
+Math.abs(1 - 3);    // 2
+    \end{lstlisting}
+    
+    \item \textbf{Special Numbers}:
+    \begin{lstlisting}
+const positiveInf = Infinity;  // or Number.POSITIVE_INFINITY
+const negativeInf = -Infinity; // or Number.NEGATIVE_INFINITY
+console.log(0 / 0);           // NaN
+console.log(Math.sqrt(-1));   // NaN
+console.log(isNaN(NaN));      // true
+    \end{lstlisting}
+    
+    \item \textbf{Division and Modulo}:
+    \begin{lstlisting}
+console.log(Math.trunc(5 / 2));    // 2 (truncates towards zero)
+console.log(Math.trunc(-5 / 2));   // -2 (truncates -2.5 to -2)
+    \end{lstlisting}
+\end{itemize}
+
+\subsection{String Manipulation}
+\begin{itemize}
+    \item \textbf{Basic Operations}:
+    \begin{lstlisting}
+const str = "hello world";
+console.log(str[0]);           // "h"
+console.log(str.charAt(0));    // "h"
+console.log(str.length);       // 11
+console.log(str.slice(0, 5));  // "hello"
+    \end{lstlisting}
+    
+    \item \textbf{Searching and Manipulation}:
+    \begin{lstlisting}
+console.log(str.indexOf("world"));    // 6
+console.log(str.includes("hello"));   // true
+console.log(str.split(" "));          // ["hello", "world"]
+console.log(str.replace("world", "there")); // "hello there"
+    \end{lstlisting}
+    
+    \item \textbf{String to Array and Back}:
+    \begin{lstlisting}
+const charArray = Array.from("hello");  // ['h', 'e', 'l', 'l', 'o']
+const newString = charArray.join("");   // "hello"
+    \end{lstlisting}
+    
+    \item \textbf{String Reversal}:
+    \begin{lstlisting}
+const reversed = "hello".split("").reverse().join(""); // "olleh"
+    \end{lstlisting}
+\end{itemize}
+
+\subsection{Loops and Iteration}
+\begin{itemize}
+    \item \textbf{For...of}: Iterates over iterable objects (arrays, strings, maps, sets)
+    \item \textbf{For...in}: Iterates over enumerable properties of an object
+    \begin{lstlisting}
+// For...of example
+const arr = [10, 20, 30];
+for (const value of arr) {
+    console.log(value); // 10, 20, 30
+}
+
+// For...in example
+const obj = { a: 1, b: 2 };
+for (const key in obj) {
+    console.log(key, obj[key]); // a 1, b 2
+}
+    \end{lstlisting}
+\end{itemize}
+
+\section{Data Structures}
+
+\subsection{Arrays}
+\begin{itemize}
+    \item \textbf{Basic Operations}:
+    \begin{lstlisting}
+// Stack operations (O(1))
+arr.push(5);     // Add to end
+arr.pop();       // Remove from end
+
+// Queue operations (O(n))
+arr.unshift(0);  // Add to beginning
+arr.shift();     // Remove from beginning
+
+// Splicing (O(n))
+arr.splice(startIndex, deleteCount, item1, item2, ...);
+    \end{lstlisting}
+    
+    \item \textbf{Array Methods}:
+    \begin{itemize}
+        \item \texttt{map()}: Transform elements
+        \item \texttt{filter()}: Select elements
+        \item \texttt{reduce()}: Accumulate values
+        \item \texttt{sort()}: Sort elements (use compare function for numbers)
+    \end{itemize}
+    
+    \item \textbf{Advanced Array Methods}:
+    \begin{lstlisting}
+// Flattening arrays
+const nested = [1, 2, [3, 4, [5, 6]]];
+console.log(nested.flat());        // [1, 2, 3, 4, [5, 6]]
+console.log(nested.flat(2));       // [1, 2, 3, 4, 5, 6]
+console.log(nested.flat(Infinity)); // [1, 2, 3, 4, 5, 6]
+
+// Array.from
+const arrayLike = { 0: "a", 1: "b", 2: "c", length: 3 };
+console.log(Array.from(arrayLike)); // ['a', 'b', 'c']
+console.log(Array.from("hello"));   // ['h', 'e', 'l', 'l', 'o']
+
+// find and findIndex
+const numbers = [5, 12, 8, 130, 44];
+console.log(numbers.find(num => num > 10));      // 12
+console.log(numbers.findIndex(num => num > 10)); // 1
+
+// some and every
+console.log(numbers.some(num => num > 100)); // true
+console.log(numbers.every(num => num > 0));  // true
+
+// flatMap
+const phrases = ["hello world", "good morning"];
+console.log(phrases.flatMap(phrase => phrase.split(" "))); 
+// ['hello', 'world', 'good', 'morning']
+    \end{lstlisting}
+    
+    \item \textbf{2D Array Initialization}:
+    \begin{lstlisting}
+const rows = 3, cols = 4;
+const grid = Array(rows).fill(0).map(() => Array(cols).fill(0));
+    \end{lstlisting}
+\end{itemize}
+
+\subsection{Sets and Maps}
+\begin{itemize}
+    \item \textbf{Set}: Collection of unique values
+    \begin{lstlisting}
+const mySet = new Set();
+mySet.add(1);
+mySet.has(1);    // true
+mySet.delete(1); // removes 1
+    \end{lstlisting}
+    
+    \item \textbf{Map}: Key-value pairs with any type as key
+    \begin{lstlisting}
+const myMap = new Map();
+myMap.set("key", "value");
+myMap.get("key");    // "value"
+myMap.has("key");    // true
+myMap.delete("key"); // removes key-value pair
+    \end{lstlisting}
+\end{itemize}
+
+\section{Functions and Scope}
+
+\subsection{Function Types}
+\begin{itemize}
+    \item \textbf{Regular Functions}
+    \item \textbf{Arrow Functions}
+    \item \textbf{Generator Functions}
+    \item \textbf{Async Functions}
+\end{itemize}
+
+\subsection{Closures and Scope}
+\begin{lstlisting}
+function outer(a, b) {
+    let c = 5;
+    
+    function inner() {
+        c = 6;  // Modifies outer scope
+        return [a, b, c];
+    }
+    
+    return inner();
+}
+\end{lstlisting}
+
+\subsection{Advanced Function Concepts}
+\begin{itemize}
+    \item \textbf{Function Currying}:
+    \begin{lstlisting}
+function curry(fn) {
+    return function curried(...args) {
+        if (args.length >= fn.length) {
+            return fn.apply(this, args);
+        } else {
+            return function(...args2) {
+                return curried.apply(this, args.concat(args2));
+            };
+        }
+    };
+}
+
+const curriedSum = curry((a, b, c) => a + b + c);
+console.log(curriedSum(1)(2)(3)); // 6
+    \end{lstlisting}
+    
+    \item \textbf{Memoization}:
+    \begin{lstlisting}
+function memoize(fn) {
+    const cache = new Map();
+    return function(...args) {
+        const key = JSON.stringify(args);
+        if (cache.has(key)) return cache.get(key);
+        const result = fn.apply(this, args);
+        cache.set(key, result);
+        return result;
+    };
+}
+
+const memoizedFib = memoize(function(n) {
+    if (n <= 1) return n;
+    return memoizedFib(n - 1) + memoizedFib(n - 2);
+});
+    \end{lstlisting}
+    
+    \item \textbf{Function Composition}:
+    \begin{lstlisting}
+function compose(...fns) {
+    return function(x) {
+        return fns.reduceRight((acc, fn) => fn(acc), x);
+    };
+}
+
+const add5 = x => x + 5;
+const multiply2 = x => x * 2;
+const composed = compose(multiply2, add5);
+console.log(composed(10)); // 30
+    \end{lstlisting}
+\end{itemize}
+
+\section{Advanced JavaScript}
+
+\subsection{Promises and Async Programming}
+\begin{itemize}
+    \item \textbf{Basic Promise}:
+    \begin{lstlisting}
+const promise = new Promise((resolve, reject) => {
+    // Async work...
+    if (success) resolve(value);
+    else reject(error);
+});
+
+promise
+    .then(value => console.log(value))
+    .catch(error => console.error(error))
+    .finally(() => console.log("Done"));
+    \end{lstlisting}
+    
+    \item \textbf{Promise Methods}:
+    \begin{lstlisting}
+// Promise.all - Wait for all promises
+Promise.all([promise1, promise2, promise3])
+    .then(values => console.log(values))
+    .catch(error => console.error(error));
+
+// Promise.race - First settled promise
+Promise.race([fast, slow])
+    .then(value => console.log(value))
+    .catch(error => console.error(error));
+
+// Promise.allSettled - Wait for all to settle
+Promise.allSettled([resolved, rejected])
+    .then(results => {
+        results.forEach(result => {
+            if (result.status === "fulfilled") {
+                console.log("Fulfilled:", result.value);
+            } else {
+                console.log("Rejected:", result.reason);
+            }
+        });
+    });
+    \end{lstlisting}
+    
+    \item \textbf{Async/Await}:
+    \begin{lstlisting}
+async function fetchData() {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+    \end{lstlisting}
+\end{itemize}
+
+\subsection{Event Loop and Timing}
+\begin{lstlisting}
+console.log("Start");
+
+setTimeout(() => {
+    console.log("Timeout callback");
+}, 0);
+
+Promise.resolve().then(() => console.log("Promise resolved"));
+
+console.log("End");
+// Output order: Start, End, Promise resolved, Timeout callback
+\end{lstlisting}
+
+\subsection{Iterators and Generators}
+\begin{itemize}
+    \item \textbf{Custom Iterator}:
+    \begin{lstlisting}
+const customIterator = {
+    data: [1, 2, 3],
+    currentIndex: 0,
+    next() {
+        if (this.currentIndex < this.data.length) {
+            return { value: this.data[this.currentIndex++], done: false };
+        }
+        return { done: true };
+    }
+};
+    \end{lstlisting}
+    
+    \item \textbf{Generator Function}:
+    \begin{lstlisting}
+function* countUp(max) {
+    let count = 0;
+    while (count < max) {
+        yield count++;
+    }
+}
+
+// Two-way communication
+function* twoWayGenerator() {
+    const a = yield "First yield";
+    console.log("Received:", a);
+    const b = yield `Second yield with ${a}`;
+    return `Final result with ${a} and ${b}`;
+}
+    \end{lstlisting}
+\end{itemize}
+
+\section{Object-Oriented JavaScript}
+
+\subsection{Classes}
+\begin{lstlisting}
+class MyClass {
+    constructor(initialValue) {
+        this.member = initialValue;
+    }
+    
+    instanceMethod() {
+        return this.member;
+    }
+    
+    static staticMethod() {
+        console.log("Static method");
+    }
+}
+\end{lstlisting}
+
+\subsection{Inheritance}
+\begin{lstlisting}
+class Child extends Parent {
+    constructor() {
+        super();
+        // Child initialization
+    }
+}
+\end{lstlisting}
+
+\section{Object Manipulation}
+
+\subsection{Deep Object Operations}
+\begin{itemize}
+    \item \textbf{Deep Copy}:
+    \begin{lstlisting}
+// Using JSON (with limitations)
+const deepCopy = JSON.parse(JSON.stringify(originalObj));
+
+// Manual deep copy
+function deepClone(obj) {
+    if (obj === null || typeof obj !== "object") return obj;
+    if (obj instanceof Date) return new Date(obj.getTime());
+    if (Array.isArray(obj)) return obj.map(item => deepClone(item));
+    
+    const copy = {};
+    Object.keys(obj).forEach(key => {
+        copy[key] = deepClone(obj[key]);
+    });
+    return copy;
+}
+    \end{lstlisting}
+    
+    \item \textbf{Deep Merge}:
+    \begin{lstlisting}
+function deepMerge(target, source) {
+    const output = { ...target };
+    if (isObject(target) && isObject(source)) {
+        Object.keys(source).forEach(key => {
+            if (isObject(source[key])) {
+                if (!(key in target)) {
+                    output[key] = source[key];
+                } else {
+                    output[key] = deepMerge(target[key], source[key]);
+                }
+            } else {
+                output[key] = source[key];
+            }
+        });
+    }
+    return output;
+}
+    \end{lstlisting}
+    
+    \item \textbf{Object Flattening}:
+    \begin{lstlisting}
+function flattenObject(obj, prefix = "") {
+    return Object.keys(obj).reduce((acc, key) => {
+        const pre = prefix.length ? prefix + "." : "";
+        if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+            Object.assign(acc, flattenObject(obj[key], pre + key));
+        } else {
+            acc[pre + key] = obj[key];
+        }
+        return acc;
+    }, {});
+}
+    \end{lstlisting}
+\end{itemize}
+
+\section{Common Data Structures Implementation}
+
+\subsection{Stack}
+\begin{lstlisting}
+const stack = [];
+stack.push(10);          // Push
+const top = stack.pop(); // Pop
+const peek = stack[stack.length - 1]; // Peek
+const isEmpty = stack.length === 0;   // Is empty
+\end{lstlisting}
+
+\subsection{Queue}
+\begin{lstlisting}
+const queue = [];
+queue.push(10);          // Enqueue
+const front = queue.shift(); // Dequeue
+const peek = queue[0];   // Peek
+const isEmpty = queue.length === 0; // Is empty
+\end{lstlisting}
+
+\subsection{MinHeap}
+\begin{lstlisting}
+class MinHeap {
+    constructor() {
+        this.heap = [];
+    }
+    
+    insert(value) {
+        this.heap.push(value);
+        this.heapifyUp(this.heap.length - 1);
+    }
+    
+    extractMin() {
+        if (this.heap.length === 0) return null;
+        const min = this.heap[0];
+        const last = this.heap.pop();
+        if (this.heap.length > 0) {
+            this.heap[0] = last;
+            this.heapifyDown(0);
+        }
+        return min;
+    }
+    
+    // Helper methods
+    getParentIndex(index) {
+        return Math.floor((index - 1) / 2);
+    }
+    
+    getLeftChildIndex(index) {
+        return 2 * index + 1;
+    }
+    
+    getRightChildIndex(index) {
+        return 2 * index + 2;
+    }
+    
+    swap(i, j) {
+        [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
+    }
+    
+    heapifyUp(index) {
+        let currentIndex = index;
+        let parentIndex = this.getParentIndex(currentIndex);
+        
+        while (currentIndex > 0 && 
+               this.heap[currentIndex] < this.heap[parentIndex]) {
+            this.swap(currentIndex, parentIndex);
+            currentIndex = parentIndex;
+            parentIndex = this.getParentIndex(currentIndex);
+        }
+    }
+    
+    heapifyDown(index) {
+        let smallest = index;
+        const leftIndex = this.getLeftChildIndex(index);
+        const rightIndex = this.getRightChildIndex(index);
+        const size = this.heap.length;
+        
+        if (leftIndex < size && 
+            this.heap[leftIndex] < this.heap[smallest]) {
+            smallest = leftIndex;
+        }
+        
+        if (rightIndex < size && 
+            this.heap[rightIndex] < this.heap[smallest]) {
+            smallest = rightIndex;
+        }
+        
+        if (smallest !== index) {
+            this.swap(index, smallest);
+            this.heapifyDown(smallest);
+        }
+    }
+}
+\end{lstlisting}
+
+\end{document} 

@@ -11,7 +11,6 @@ import {
   Platform,
   StatusBar,
   ScrollView,
-  SafeAreaView,
   Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -19,6 +18,7 @@ import LottieView from 'lottie-react-native';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import GradientText from './gradienttext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SafeAreaWrapper from '../components/SafeAreaWrapper';
 
 // Type definitions
 interface LoginScreenProps {
@@ -119,14 +119,39 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
 
   const handleOTPChange = (text: string, index: number) => {
     const newOTP = [...otp];
+    
+    // Handle backspace - if text is empty and we're deleting, clear current and go back
+    if (text === '' && newOTP[index] !== '') {
+      newOTP[index] = '';
+      setOTP(newOTP);
+      
+      // Move focus to previous input if available
+      if (index > 0) {
+        otpRefs.current[index - 1]?.focus();
+      }
+      
+      // Check if OTP is complete
+      const isComplete = newOTP.every(digit => digit.length === 1);
+      setIsOTPComplete(isComplete);
+      return;
+    }
+    
+    // Handle normal input - only allow single digits
+    if (text.length > 1) {
+      text = text.slice(-1); // Take only the last character
+    }
+    
+    // Only allow numeric input
+    if (!/^\d*$/.test(text)) {
+      return;
+    }
+    
     newOTP[index] = text;
     setOTP(newOTP);
 
-    // Auto-focus next input
+    // Auto-focus next input if we have a digit and there's a next input
     if (text && index < 5) {
       otpRefs.current[index + 1]?.focus();
-    } else if (!text && index > 0) {
-      otpRefs.current[index - 1]?.focus();
     }
 
     // Check if OTP is complete
@@ -306,7 +331,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaWrapper backgroundColor="white" showGradient={false}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
@@ -484,12 +509,22 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
                     <TextInput
                       key={index}
                       ref={ref => (otpRefs.current[index] = ref)}
-                      style={[styles.otpInput, digit && styles.otpInputFilled]}
+                      style={[styles.otpInput, digit ? styles.otpInputFilled : null]}
                       maxLength={1}
                       keyboardType="numeric"
                       value={digit}
                       onChangeText={text => handleOTPChange(text, index)}
+                      onKeyPress={({nativeEvent}) => {
+                        // Handle backspace key press
+                        if (nativeEvent.key === 'Backspace' && !digit && index > 0) {
+                          // If current field is empty and backspace is pressed, go to previous field
+                          otpRefs.current[index - 1]?.focus();
+                        }
+                      }}
                       editable={!isLoading}
+                      autoFocus={index === 0}
+                      selectTextOnFocus={true}
+                      textContentType="oneTimeCode"
                     />
                   ))}
                 </View>
@@ -541,15 +576,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </SafeAreaWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
   container: {
     flex: 1,
     backgroundColor: 'white',
