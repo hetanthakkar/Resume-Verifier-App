@@ -43,7 +43,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - PDFNet (3.0.4-10)
+  - PDFNet (11.4.0.85243)
   - RCT-Folly (2024.01.01.00):
     - boost
     - DoubleConversion
@@ -1584,9 +1584,9 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   lottie-ios: a881093fab623c467d3bce374367755c272bdd59
   lottie-react-native: 795b47c11998b6c7e6da65e08255cb67544072f6
-  PDFNet: 23a1b6649c1a18c7b64e1bbdd9d24ce6f706cd56
+  PDFNet: f9084292945202cb3e73f8978278e44237e7f4c4
   RCT-Folly: 02617c592a293bd6d418e0a88ff4ee1f88329b47
-  RCTDeprecation: 121d32efb5b3b0712c2c177beb858d050e5f48c5
+  RCTDeprecation: 3afceddffa65aee666dafd6f0116f1d975db1584
   RCTRequired: ec1239bc9d8bf63e10fb92bd8b26171a9258e0c1
   RCTTypeSafety: f5ecbc86c5c5fa163c05acb7a1c5012e15b5f994
   React: fc9fa7258eff606f44d58c5b233a82dc9cf09018
@@ -1642,11 +1642,11 @@ SPEC CHECKSUMS:
   RNPdftron: 579d49d1d48904bfed674b3d0b502c880f61a3ab
   RNReanimated: 1aa58bd51e7be452e756a4fe0697bf0311844a2f
   RNScreens: 7001fd611bd5d62f0ee30170496c01e68084a77d
-  RNSVG: 7268638e737364540ff8f010afb69998f3855ecb
+  RNSVG: 5da7a24f31968ec74f0b091e3440080f347e279b
   RNVectorIcons: 9f527a8006d19ca19cbd94af515aba61b9fbe71b
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: 1ab23c1835475da69cf14e211a560e73aab24cb0
 
 PODFILE CHECKSUM: 5a891edb314f99e2b0e45bf279ca0868f49e906a
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.16.2
