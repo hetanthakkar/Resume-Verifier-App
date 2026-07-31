@@ -2,6 +2,7 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTheme } from '../theme/ThemeContext';
 
 interface SafeAreaWrapperProps {
   children: React.ReactNode;
@@ -12,17 +13,25 @@ interface SafeAreaWrapperProps {
 
 const SafeAreaWrapper: React.FC<SafeAreaWrapperProps> = ({
   children,
-  gradientColors = ['#FFFFFF', '#F0F0F3'],
-  backgroundColor = '#FFFFFF',
+  gradientColors,
+  backgroundColor,
   showGradient = true,
 }) => {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+
+  // Use theme colors if not provided
+  const defaultGradientColors = theme.colors.gradients.primary;
+  const defaultBackgroundColor = theme.colors.background;
+
+  const finalGradientColors = gradientColors || defaultGradientColors;
+  const finalBackgroundColor = backgroundColor || defaultBackgroundColor;
 
   return (
-    <View style={[styles.container, {backgroundColor}]}>
+    <View style={[styles.container, {backgroundColor: finalBackgroundColor}]}>
       {showGradient && (
         <LinearGradient
-          colors={gradientColors}
+          colors={finalGradientColors}
           style={[
             styles.gradientBackground,
             {

@@ -4,6 +4,7 @@ import {Provider as PaperProvider} from 'react-native-paper';
 import AppNavigator from './src/navigators/AppNavigator';
 import {StatusBar, StyleSheet} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {ThemeProvider, useTheme} from './src/theme/ThemeContext';
 import 'react-native-gesture-handler';
 
 interface RouteNameContextType {
@@ -15,7 +16,8 @@ export const RouteNameContext = React.createContext<
   RouteNameContextType | undefined
 >(undefined);
 
-export default function App() {
+const AppContent: React.FC = () => {
+  const { theme, isDark } = useTheme();
   const [currentRouteName, setCurrentRouteName] = React.useState<
     string | undefined
   >(undefined);
@@ -24,8 +26,8 @@ export default function App() {
     <SafeAreaProvider>
       <PaperProvider>
         <StatusBar
-          barStyle="dark-content"
-          backgroundColor="transparent"
+          barStyle={isDark ? "light-content" : "dark-content"}
+          backgroundColor={theme.colors.statusBar}
           translucent
         />
         <RouteNameContext.Provider
@@ -36,6 +38,14 @@ export default function App() {
         </RouteNameContext.Provider>
       </PaperProvider>
     </SafeAreaProvider>
+  );
+};
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

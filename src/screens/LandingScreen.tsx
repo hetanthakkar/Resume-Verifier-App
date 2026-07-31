@@ -14,10 +14,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import GradientText from './gradienttext';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import GoogleAuth from '../hooks/GoogleAuth';
 import SafeAreaWrapper from '../components/SafeAreaWrapper';
+import {useTheme} from '../theme/ThemeContext';
 
 const WelcomeScreen = ({navigation}) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -46,6 +44,7 @@ const WelcomeScreen = ({navigation}) => {
     ios: 'http://localhost:8000',
     android: 'http://10.0.2.2:8000', // Android emulator localhost equivalent
   });
+  const { theme } = useTheme();
   const handleScroll = event => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
     const index = event.nativeEvent.contentOffset.x / slideSize;
@@ -59,38 +58,13 @@ const WelcomeScreen = ({navigation}) => {
     checkOnboarding();
   });
   const handleGoogleSignIn = async () => {
-    const {signIn} = GoogleAuth();
-
-    try {
-      const {success, user, error, is_new_user} = await signIn();
-      if (success) {
-        if (is_new_user) {
-          navigation.navigate('Home');
-        } else {
-          navigation.navigate('Login', {
-            googleUser: {
-              email: user.email,
-              name: user.name || '',
-              familyName: user.familyName || '',
-              givenName: user.givenName || '',
-              accessToken: user.accessToken,
-            },
-            isGoogleSignIn: true,
-          });
-        }
-      } else {
-        console.error('Login failed:', error);
-        Alert.alert('Error', 'Google sign in failed');
-      }
-    } catch (error) {
-      console.error('Google sign in error:', error);
-      Alert.alert('Error', 'Failed to sign in with Google');
-    }
+    // For now, just navigate to login
+    navigation.navigate('Login');
   };
 
   return (
-    <SafeAreaWrapper gradientColors={['red', 'green']}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaWrapper gradientColors={theme.colors.gradients.primary}>
+      <StatusBar barStyle={theme.colors.text === '#FFFFFF' ? "light-content" : "dark-content"} />
       <View style={styles.header}>
         <GradientText leftMargin={0} />
       </View>
@@ -109,8 +83,8 @@ const WelcomeScreen = ({navigation}) => {
                 style={styles.iconBackground}>
                 <IonIcons name={item.icon} size={40} color="#FFFFFF" />
               </LinearGradient>
-              <Text style={styles.carouselTitle}>{item.title}</Text>
-              <Text style={styles.carouselText}>{item.text}</Text>
+              <Text style={[styles.carouselTitle, { color: theme.colors.text }]}>{item.title}</Text>
+              <Text style={[styles.carouselText, { color: theme.colors.textSecondary }]}>{item.text}</Text>
             </View>
           ))}
         </ScrollView>
@@ -120,70 +94,40 @@ const WelcomeScreen = ({navigation}) => {
               key={index}
               style={[
                 styles.paginationDot,
-                index === activeIndex ? styles.paginationDotActive : null,
+                { backgroundColor: theme.colors.border },
+                index === activeIndex ? [styles.paginationDotActive, { backgroundColor: theme.colors.primary }] : null,
               ]}
             />
           ))}
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        {Platform.OS === 'ios' ? (
-          <>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => console.log('Continue with Apple')}>
-              <FontAwesome
-                name="apple"
-                size={20}
-                color="#000"
-                style={styles.icon}
-              />
-              <Text style={styles.socialButtonText}>Continue with Apple</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => navigation.navigate('Login')}>
-              <IonIcons
-                name="mail-open"
-                size={20}
-                color="#000"
-                style={styles.icon}
-              />
-              <Text style={styles.socialButtonText}>
-                Continue with Work Email
-              </Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={handleGoogleSignIn}>
-              <FontAwesome
-                name="google"
-                size={20}
-                color="#DB4437"
-                style={styles.icon}
-              />
-              <Text style={styles.socialButtonText}>
-                Continue with Google
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => navigation.navigate('Login')}>
-              <IonIcons
-                name="mail-open"
-                size={20}
-                color="#000"
-                style={styles.icon}
-              />
-              <Text style={styles.socialButtonText}>
-                Continue with Work Email
-              </Text>
-            </TouchableOpacity>
-          </>
-        )}
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleGoogleSignIn}>
+          <FontAwesome
+            name="google"
+            size={20}
+            color="#DB4437"
+            style={styles.icon}
+          />
+          <Text style={styles.socialButtonText}>
+            Continue with Google
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={() => navigation.navigate('Login')}>
+          <IonIcons
+            name="mail-open"
+            size={20}
+            color="#000"
+            style={styles.icon}
+          />
+          <Text style={styles.socialButtonText}>
+            Continue with Work Email
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaWrapper>
   );
@@ -201,12 +145,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   carouselContainer: {
-    height: screenHeight * 0.5,
+    height: Dimensions.get('window').height * 0.5,
     justifyContent: 'center',
     alignItems: 'center',
   },
   carouselItem: {
-    width: screenWidth - 40,
+    width: Dimensions.get('window').width - 40,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,

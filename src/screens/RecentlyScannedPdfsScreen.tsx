@@ -13,22 +13,39 @@ import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RouteNameContext} from '../../App';
+import { useTheme } from '../theme/ThemeContext';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
-const ResumeListScreen = ({navigation, route}) => {
-  const {setCurrentRouteName} = React.useContext(RouteNameContext);
-  const [recentScans, setRecentScans] = useState([]);
+interface RecentScan {
+  id: number;
+  candidate_name: string;
+  job_title?: string;
+  analyzed_at: string;
+  job_id: number;
+  resume_id: number;
+  analysis_data: any;
+}
+
+interface ResumeListScreenProps {
+  navigation: any;
+  route: any;
+}
+
+const ResumeListScreen: React.FC<ResumeListScreenProps> = ({navigation, route}) => {
+  const routeNameContext = React.useContext(RouteNameContext);
+  const { theme } = useTheme();
+  const [recentScans, setRecentScans] = useState<RecentScan[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [jobCache, setJobCache] = useState({});
   const job = route.params?.job;
 
   const gradientColors = [
-    ['#FF6B6B', '#FF8E8E'],
-    ['#4ECDC4', '#45B7A8'],
-    ['#45AAF2', '#2D98DA'],
-    ['#FF9FF3', '#F368E0'],
+    theme.colors.gradients.error,
+    theme.colors.gradients.teal,
+    theme.colors.gradients.blue,
+    theme.colors.gradients.pink,
   ];
 
   useEffect(() => {
@@ -52,7 +69,7 @@ const ResumeListScreen = ({navigation, route}) => {
     }
   };
 
-  const fetchJob = async jobId => {
+  const fetchJob = async (jobId: number) => {
     try {
       // Check cache first
       if (jobCache[jobId]) {
@@ -75,6 +92,7 @@ const ResumeListScreen = ({navigation, route}) => {
       return null;
     }
   };
+
   const fetchResume = async (resumeId: number) => {
     console.log('Fetching resume:', resumeId);
 
@@ -92,9 +110,9 @@ const ResumeListScreen = ({navigation, route}) => {
     }
   };
 
-  const handleItemPress = async item => {
+  const handleItemPress = async (item: RecentScan) => {
     try {
-      setCurrentRouteName('InnerHome');
+      routeNameContext?.setCurrentRouteName('InnerHome');
       const jobData = await fetchJob(item.job_id);
       const resume = await fetchResume(item.resume_id);
       console.log('resume is', resume);
@@ -114,8 +132,9 @@ const ResumeListScreen = ({navigation, route}) => {
       console.error('Error handling item press:', error);
     }
   };
+
   // Move the hooks to a separate functional component
-  const ResumeItem = ({item, index, job, navigation}) => {
+  const ResumeItem: React.FC<{item: RecentScan; index: number; job: any; navigation: any}> = ({item, index, job, navigation}) => {
     return (
       <TouchableOpacity
         onPress={() => handleItemPress(item)}
@@ -146,7 +165,8 @@ const ResumeListScreen = ({navigation, route}) => {
   const filteredScans = recentScans.filter(scan =>
     scan.candidate_name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  const renderItem = ({item, index}) => {
+
+  const renderItem = ({item, index}: {item: RecentScan; index: number}) => {
     return (
       <ResumeItem item={item} index={index} job={job} navigation={navigation} />
     );
@@ -154,26 +174,31 @@ const ResumeListScreen = ({navigation, route}) => {
 
   if (loading) {
     return (
-      <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View style={[styles.container, styles.centerContent, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Recently Scanned Resumes</Text>
-      <View style={styles.searchContainer}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text style={[styles.header, { color: theme.colors.primary }]}>Recently Scanned Resumes</Text>
+      <View style={[styles.searchContainer, { 
+        backgroundColor: theme.colors.input,
+        borderColor: theme.colors.border 
+      }]}>
         <Ionicons
           name="search"
           size={20}
-          color="#999"
+          color={theme.colors.textTertiary}
           style={styles.searchIcon}
         />
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { 
+            color: theme.colors.text 
+          }]}
           placeholder="Search candidates..."
-          placeholderTextColor="#999"
+          placeholderTextColor={theme.colors.textTertiary}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -186,7 +211,7 @@ const ResumeListScreen = ({navigation, route}) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>
+          <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
             {searchQuery ? 'No matches found' : 'No recent scans available'}
           </Text>
         }
@@ -198,7 +223,6 @@ const ResumeListScreen = ({navigation, route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
     paddingHorizontal: 16,
     paddingTop: 24,
   },
@@ -209,7 +233,6 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#007AFF',
     marginBottom: 20,
   },
   listContainer: {
@@ -253,7 +276,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 16,
     borderWidth: 0.5,
-    borderColor: 'grey',
   },
   searchIcon: {
     marginRight: 10,
@@ -265,7 +287,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     textAlign: 'center',
-    color: '#666',
     fontSize: 16,
     marginTop: 20,
   },

@@ -4,132 +4,94 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Modal,
   TextInput,
 } from 'react-native';
+import { useTheme } from '../theme/ThemeContext';
 
-const API_BASE_URL = 'http://localhost:8000/api';
-
-interface ForgotPasswordModalProps {
+interface EditModalProps {
   visible: boolean;
   onClose: () => void;
+  onSave: (value: string) => void;
+  value: string;
+  title: string;
+  field: 'name' | 'company' | 'email';
 }
 
-const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
+const EditModal: React.FC<EditModalProps> = ({
   visible,
   onClose,
+  onSave,
+  value,
+  title,
+  field,
 }) => {
-  const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
+  const [inputValue, setInputValue] = useState(value);
+  const { theme } = useTheme();
 
-  const handleRequestOTP = async () => {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/auth/forgot-password/`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({email}),
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Forgot password request response:', data);
-        setOtpSent(true);
-        Alert.alert('Success', 'Verification code has been sent to your email');
-      } else {
-        const data = await response.json();
-        console.log('Forgot password request error:', data);
-        Alert.alert('Error', data.message || 'Failed to send verification code');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Network error. Please try again.');
+  const handleSave = () => {
+    if (inputValue.trim()) {
+      onSave(inputValue.trim());
+      onClose();
     }
   };
 
-  const handleResetPassword = async () => {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/auth/reset-password/`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            otp,
-            new_password: newPassword,
-          }),
-        },
-      );
+  const getPlaceholder = () => {
+    switch (field) {
+      case 'name':
+        return 'Enter your name';
+      case 'email':
+        return 'Enter your email';
+      case 'company':
+        return 'Enter your company';
+      default:
+        return 'Enter value';
+    }
+  };
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Password reset response:', data);
-        Alert.alert('Success', 'Password has been reset successfully');
-        onClose();
-      } else {
-        const data = await response.json();
-        console.log('Password reset error:', data);
-        Alert.alert('Error', data.message || 'Failed to reset password');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Network error. Please try again.');
+  const getKeyboardType = () => {
+    switch (field) {
+      case 'email':
+        return 'email-address';
+      default:
+        return 'default';
     }
   };
 
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Reset Password</Text>
+      <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}>
+        <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>{title}</Text>
           
           <TextInput
-            style={styles.modalInput}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-            autoCapitalize="none"
-            keyboardType="email-address"
+            style={[
+              styles.modalInput,
+              {
+                backgroundColor: theme.colors.input,
+                borderColor: theme.colors.border,
+                color: theme.colors.text,
+              },
+            ]}
+            value={inputValue}
+            onChangeText={setInputValue}
+            placeholder={getPlaceholder()}
+            placeholderTextColor={theme.colors.textTertiary}
+            autoCapitalize={field === 'name' ? 'words' : 'none'}
+            keyboardType={getKeyboardType()}
+            autoFocus
           />
 
-          {otpSent && (
-            <>
-              <TextInput
-                style={styles.modalInput}
-                value={otp}
-                onChangeText={setOtp}
-                placeholder="Enter verification code"
-                keyboardType="number-pad"
-                maxLength={6}
-              />
-              <TextInput
-                style={styles.modalInput}
-                value={newPassword}
-                onChangeText={setNewPassword}
-                placeholder="Enter new password"
-                secureTextEntry
-              />
-            </>
-          )}
-
           <View style={styles.modalButtons}>
-            <TouchableOpacity onPress={onClose} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Cancel</Text>
+            <TouchableOpacity 
+              onPress={onClose} 
+              style={[styles.modalButton, { backgroundColor: theme.colors.border }]}>
+              <Text style={[styles.modalButtonText, { color: theme.colors.text }]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={otpSent ? handleResetPassword : handleRequestOTP}
-              style={[styles.modalButton, styles.modalButtonPrimary]}>
-              <Text style={styles.modalButtonTextPrimary}>
-                {otpSent ? 'Reset Password' : 'Send Code'}
-              </Text>
+              onPress={handleSave}
+              style={[styles.modalButton, styles.modalButtonPrimary, { backgroundColor: theme.colors.primary }]}>
+              <Text style={styles.modalButtonTextPrimary}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -141,15 +103,14 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 12,
     width: '80%',
+    maxWidth: 400,
   },
   modalTitle: {
     fontSize: 20,
@@ -159,33 +120,34 @@ const styles = StyleSheet.create({
   },
   modalInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 15,
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+    fontSize: 16,
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 12,
   },
   modalButton: {
     flex: 1,
-    padding: 10,
-    marginHorizontal: 5,
-    borderRadius: 5,
-    backgroundColor: '#f0f0f0',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   modalButtonPrimary: {
-    backgroundColor: '#007AFF',
+    // backgroundColor will be set dynamically
   },
   modalButtonText: {
-    textAlign: 'center',
-    color: '#333',
+    fontSize: 16,
+    fontWeight: '500',
   },
   modalButtonTextPrimary: {
-    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '500',
     color: 'white',
   },
 });
 
-export default ForgotPasswordModal;
+export default EditModal;

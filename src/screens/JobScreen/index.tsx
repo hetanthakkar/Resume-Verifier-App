@@ -13,6 +13,7 @@ import Modal from 'react-native-modal';
 import JobCard from './JobCard';
 import EmptyState from './EmptyState';
 import {GRADIENT_COLORS, apiCall, API_BASE_URL} from './utils';
+import { useTheme } from '../../theme/ThemeContext';
 
 interface Job {
   id: number;
@@ -21,6 +22,7 @@ interface Job {
 }
 
 const JobPortals = ({navigation}) => {
+  const { theme } = useTheme();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCodeModalVisible, setCodeModalVisible] = useState(false);
@@ -35,7 +37,6 @@ const JobPortals = ({navigation}) => {
       const response = await apiCall(`${API_BASE_URL}/api/jobs/`);
       if (response.ok) {
         const data = await response.json();
-        console.log('response is', data);
         setJobs(data);
       } else if (response.status === 401) {
         navigation.navigate('Login');
@@ -93,8 +94,9 @@ const JobPortals = ({navigation}) => {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
+          backgroundColor: theme.colors.background,
         }}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -103,13 +105,13 @@ const JobPortals = ({navigation}) => {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: '#F8F9FA',
+        backgroundColor: theme.colors.background,
       }}>
       <View
         style={{
           padding: 16,
-          backgroundColor: '#F8F9FA',
-          borderBottomColor: '#E9ECEF',
+          backgroundColor: theme.colors.background,
+          borderBottomColor: theme.colors.border,
         }}>
         <View
           style={{
@@ -122,7 +124,7 @@ const JobPortals = ({navigation}) => {
             style={{
               fontSize: 28,
               fontWeight: 'bold',
-              color: '#2C3E50',
+              color: theme.colors.text,
             }}>
             Your Job Postings
           </Text>
@@ -134,7 +136,7 @@ const JobPortals = ({navigation}) => {
             <Text
               style={{
                 fontSize: 24,
-                color: '#007AFF',
+                color: theme.colors.primary,
               }}>
               ↻
             </Text>
@@ -155,7 +157,7 @@ const JobPortals = ({navigation}) => {
                   alignItems: 'center',
                 },
                 {
-                  backgroundColor: '#28A745',
+                  backgroundColor: theme.colors.success,
                 },
               ]}
               onPress={handleJoinGroup}>
@@ -177,7 +179,7 @@ const JobPortals = ({navigation}) => {
                   alignItems: 'center',
                 },
                 {
-                  backgroundColor: '#007AFF',
+                  backgroundColor: theme.colors.primary,
                 },
               ]}
               onPress={() => navigation.navigate('CreateJob')}>
@@ -230,7 +232,7 @@ const JobPortals = ({navigation}) => {
         avoidKeyboard>
         <View
           style={{
-            backgroundColor: 'white',
+            backgroundColor: theme.colors.surface,
             padding: 20,
             borderRadius: 12,
           }}>
@@ -240,21 +242,25 @@ const JobPortals = ({navigation}) => {
               fontWeight: 'bold',
               marginBottom: 16,
               textAlign: 'center',
+              color: theme.colors.text,
             }}>
             Enter Group Code
           </Text>
           <TextInput
             style={{
               borderWidth: 1,
-              borderColor: '#E0E0E0',
+              borderColor: theme.colors.border,
               borderRadius: 8,
               padding: 12,
               fontSize: 16,
               marginBottom: 16,
+              backgroundColor: theme.colors.input,
+              color: theme.colors.text,
             }}
             value={groupCode}
             onChangeText={setGroupCode}
             placeholder="Enter code"
+            placeholderTextColor={theme.colors.textTertiary}
             keyboardType="number-pad"
             autoFocus
           />
@@ -273,13 +279,13 @@ const JobPortals = ({navigation}) => {
                   alignItems: 'center',
                 },
                 {
-                  backgroundColor: '#E0E0E0',
+                  backgroundColor: theme.colors.border,
                 },
               ]}
               onPress={() => setCodeModalVisible(false)}>
               <Text
                 style={{
-                  color: '#666',
+                  color: theme.colors.textSecondary,
                   fontWeight: '600',
                 }}>
                 Cancel
@@ -294,7 +300,7 @@ const JobPortals = ({navigation}) => {
                   alignItems: 'center',
                 },
                 {
-                  backgroundColor: '#28A745',
+                  backgroundColor: theme.colors.success,
                 },
               ]}
               onPress={submitGroupCode}>

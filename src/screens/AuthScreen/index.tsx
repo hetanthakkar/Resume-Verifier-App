@@ -191,30 +191,19 @@ const AuthScreen = ({route, navigation}) => {
   };
 
   const handleGoogleSubmit = async () => {
-    if (!name || !company || isLoading) return;
+    if (!name || isLoading) return;
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/update-profile/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${googleUser?.accessToken}`,
-        },
-        body: JSON.stringify({name, company}),
+      // Navigate to company selection screen
+      navigation.navigate('CompanySelection', {
+        googleUser: googleUser,
+        user: { ...googleUser, name },
+        accessToken: googleUser?.accessToken,
+        refreshToken: googleUser?.refreshToken,
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        await AsyncStorage.setItem('accessToken', data.access);
-        await AsyncStorage.setItem('refreshToken', data.refresh);
-        await AsyncStorage.setItem('userData', JSON.stringify(data.user));
-        navigation.navigate('Home');
-      } else {
-        Alert.alert('Error', data.error || 'Update failed');
-      }
     } catch (error) {
-      Alert.alert('Error', 'Update failed');
+      Alert.alert('Error', 'Failed to proceed');
     } finally {
       setIsLoading(false);
     }
@@ -266,28 +255,16 @@ const AuthScreen = ({route, navigation}) => {
         </View>
 
         {isGoogleSignIn && (
-          <>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Full Name</Text>
-              <TextInput
-                style={styles.input}
-                value={name}
-                onChangeText={setName}
-                placeholder="Enter your full name"
-                editable={!isLoading}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Company</Text>
-              <TextInput
-                style={styles.input}
-                value={company}
-                onChangeText={setCompany}
-                placeholder="Enter your company"
-                editable={!isLoading}
-              />
-            </View>
-          </>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Full Name</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Enter your full name"
+              editable={!isLoading}
+            />
+          </View>
         )}
 
         {!isGoogleSignIn && (

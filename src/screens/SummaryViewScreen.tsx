@@ -5,92 +5,80 @@ import {
   ScrollView,
   StyleSheet,
   useWindowDimensions,
+  TouchableOpacity,
 } from 'react-native';
 import {TabView, TabBar} from 'react-native-tab-view';
-import {Card} from 'react-native-paper';
-import data from '../static_data/data';
-import job from '../static_data/job';
-const MatchMetricsBar = ({label, value}) => (
-  <View style={styles.metricBar}>
-    <View style={styles.metricLabelContainer}>
-      <Text style={styles.metricLabel}>{label}</Text>
-      <Text style={styles.metricValue}>{value.toFixed(1)}%</Text>
-    </View>
-    <View style={styles.progressBarBackground}>
-      <View
-        style={[
-          styles.progressBarFill,
-          {
-            width: `${value}%`,
-            backgroundColor:
-              value >= 70 ? '#4CAF50' : value >= 40 ? '#FFA000' : '#F44336',
-          },
-        ]}
-      />
-    </View>
+import Icon from 'react-native-vector-icons/Ionicons';
+
+// Modern Score Card Component
+const ScoreCard = ({title, score, color, subtitle}) => (
+  <View style={[styles.scoreCard, {borderLeftColor: color}]}>
+    <Text style={styles.scoreCardTitle}>{title}</Text>
+    <Text style={[styles.scoreCardValue, {color}]}>{score}</Text>
+    {subtitle && <Text style={styles.scoreCardSubtitle}>{subtitle}</Text>}
   </View>
 );
 
-const JobDetailsHeader = ({job}) => {
+// Simplified Requirement Card
+const RequirementCard = ({title, isMatch, justification}) => (
+  <View style={styles.requirementCard}>
+    <View style={styles.requirementHeader}>
+      <Icon 
+        name={isMatch ? 'checkmark-circle' : 'close-circle'} 
+        size={20} 
+        color={isMatch ? '#10B981' : '#EF4444'} 
+      />
+      <Text style={styles.requirementTitle}>{title}</Text>
+    </View>
+    <Text style={styles.requirementText}>{justification}</Text>
+  </View>
+);
+
+// Simplified Skill Card
+const SkillCard = ({skill, project, description}) => (
+  <View style={styles.skillCard}>
+    <View style={styles.skillHeader}>
+      <Text style={styles.skillName}>{skill}</Text>
+      <View style={styles.projectBadge}>
+        <Text style={styles.projectBadgeText}>{project}</Text>
+      </View>
+    </View>
+    <Text style={styles.skillDescription}>{description}</Text>
+  </View>
+);
+
+// Job Match Tab - Simplified
+const JobMatchTab = ({jobMatch}) => {
+  const overallScore = ((jobMatch.required_skills_matched.length * 3 + 
+    jobMatch.preferred_skills_matched.length + 
+    (jobMatch.experience_match.meets_requirement ? 1 : 0) * 2 + 
+    (jobMatch.education_match.meets_requirement ? 1 : 0) * 2) / 
+    (3 * jobMatch.required_skills_matched.length + 
+    jobMatch.preferred_skills_matched.length + 4)) * 10;
+
   return (
-    <View style={styles.header}>
-      <View style={styles.jobTitleSection}>
-        <Text style={styles.jobTitle}>{job.title}</Text>
-        <Text style={styles.companyName}>{job.company}</Text>
-        <Text style={styles.location}>{job.location}</Text>
-      </View>
-
-      <View style={styles.detailItem}>
-        <Text style={styles.detailLabel}>Experience</Text>
-        <Text style={styles.detailValue}>{job.required_experience}</Text>
-      </View>
-
-      <View style={styles.skillsSection}>
-        <View style={styles.skillGroup}>
-          <Text style={styles.skillLabel}>Required Skills</Text>
-          <View style={styles.skillTags}>
-            {job.required_skills.map((skill, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{skill}</Text>
-              </View>
-            ))}
-          </View>
+    <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
+      {/* Overall Score */}
+      <View style={styles.overallScoreSection}>
+        <Text style={styles.sectionTitle}>Overall Match</Text>
+        <View style={styles.scoreGrid}>
+          <ScoreCard 
+            title="Match Score" 
+            score={`${overallScore.toFixed(1)}/10`}
+            color="#3B82F6"
+            subtitle="Based on skills & requirements"
+          />
+          <ScoreCard 
+            title="Skills Matched" 
+            score={`${jobMatch.required_skills_matched.length}/${jobMatch.required_skills_matched.length + jobMatch.preferred_skills_matched.length}`}
+            color="#10B981"
+            subtitle="Required & preferred"
+          />
         </View>
       </View>
-    </View>
-  );
-};
 
-const RequirementCard = ({title, isMatch, justification}) => (
-  <Card style={styles.requirementCard}>
-    <View style={styles.requirementHeader}>
-      <Text style={styles.requirementTitle}>{title}</Text>
-      <View
-        style={[
-          styles.requirementBadge,
-          {backgroundColor: isMatch ? '#4CAF50' : '#F44336'},
-        ]}>
-        <Text style={styles.requirementBadgeText}>
-          {isMatch ? 'Met' : 'Not Met'}
-        </Text>
-      </View>
-    </View>
-    <Text style={styles.requirementJustification}>{justification}</Text>
-  </Card>
-);
-const SkillMatchCard = ({skill, project, description}) => (
-  <Card style={styles.skillCard}>
-    <Text style={styles.skillName}>{skill}</Text>
-    <Text style={styles.skillProject}>{project}</Text>
-    <Text style={styles.skillDescription}>{description}</Text>
-  </Card>
-);
-
-// New Job Match Tab component
-const JobMatchTab = ({jobMatch}) => {
-  return (
-    <ScrollView style={styles.tabContent}>
-      <View style={styles.requirementsSection}>
+      {/* Core Requirements */}
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Core Requirements</Text>
         <RequirementCard
           title="Experience"
@@ -104,198 +92,182 @@ const JobMatchTab = ({jobMatch}) => {
         />
       </View>
 
-      <View style={styles.skillsSection}>
+      {/* Skills */}
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Required Skills</Text>
         {jobMatch.required_skills_matched.map((skill, index) => (
-          <SkillMatchCard key={`req-${index}`} {...skill} />
+          <SkillCard key={`req-${index}`} {...skill} />
         ))}
       </View>
 
-      <View style={styles.preferredSkillsSection}>
-        <Text style={styles.sectionTitle}>Preferred Skills</Text>
-        {jobMatch.preferred_skills_matched.map((skill, index) => (
-          <SkillMatchCard key={`pref-${index}`} {...skill} />
-        ))}
-      </View>
-    </ScrollView>
-  );
-};
-const ExperienceCard = ({experience, detailedMetrics}) => (
-  <Card style={styles.experienceCard}>
-    <Text style={styles.companyName}>{experience.company}</Text>
-    <Text style={styles.jobTitle}>{experience.title}</Text>
-    <Text style={styles.duration}>{experience.duration}</Text>
-
-    <View style={styles.metricsContainer}>
-      <Text style={styles.metricsTitle}>Match Metrics</Text>
-      <View style={styles.overallScoreContainer}>
-        <Text style={styles.overallScoreLabel}>Overall Match Score</Text>
-        <Text
-          style={[
-            styles.overallScoreValue,
-            {
-              color:
-                detailedMetrics.overall_score >= 7
-                  ? '#4CAF50'
-                  : detailedMetrics.overall_score >= 5
-                  ? '#FFA000'
-                  : '#F44336',
-            },
-          ]}>
-          {detailedMetrics.overall_score.toFixed(2)}
-        </Text>
-      </View>
-
-      <View style={styles.detailedMetrics}>
-        <MatchMetricsBar
-          label="Company Match"
-          value={detailedMetrics.detailed_scores.company_match}
-        />
-        <MatchMetricsBar
-          label="Title Match"
-          value={detailedMetrics.detailed_scores.title_match}
-        />
-        <MatchMetricsBar
-          label="Date Match"
-          value={detailedMetrics.detailed_scores.date_match}
-        />
-        <MatchMetricsBar
-          label="Location Match"
-          value={detailedMetrics.detailed_scores.location_match}
-        />
-        <MatchMetricsBar
-          label="Responsibilities"
-          value={detailedMetrics.detailed_scores.responsibilities_match}
-        />
-      </View>
-    </View>
-  </Card>
-);
-
-const ProjectCard = ({project}) => (
-  <Card style={styles.projectCard}>
-    <View style={styles.projectHeader}>
-      <View style={styles.projectTitleContainer}>
-        <Text style={styles.projectName}>{project.name}</Text>
-        <Text style={styles.projectUrl}>{project.url}</Text>
-      </View>
-      <View style={styles.projectScoreBadge}>
-        <Text style={styles.projectScoreText}>
-          {project.verification_score.toFixed(1)}
-        </Text>
-      </View>
-    </View>
-
-    <View style={styles.projectStatusContainer}>
-      <Text style={styles.projectStatusLabel}>Status:</Text>
-      <View
-        style={[
-          styles.statusBadge,
-          {
-            backgroundColor:
-              project.status === 'Verified' ? '#E8F5E9' : '#FFF3E0',
-          },
-        ]}>
-        <Text
-          style={[
-            styles.projectStatusValue,
-            {color: project.status === 'Verified' ? '#2E7D32' : '#EF6C00'},
-          ]}>
-          {project.status}
-        </Text>
-      </View>
-    </View>
-
-    {project.details.match_justification && (
-      <Text style={styles.matchJustification}>
-        {project.details.match_justification}
-      </Text>
-    )}
-
-    {project.details?.repository_statistics?.languages &&
-      Object.entries(project.details.repository_statistics.languages).length >
-        0 && (
-        <View style={styles.languagesContainer}>
-          <Text style={styles.languagesTitle}>Technologies Used</Text>
-          <View style={styles.languages}>
-            {Object.entries(
-              project.details.repository_statistics.languages,
-            ).map(([lang, bytes]) => (
-              <View key={lang} style={styles.languageItem}>
-                <Text style={styles.languageName}>{lang}</Text>
-                <Text style={styles.languageBytes}>
-                  {(bytes / 1024).toFixed(1)}KB
-                </Text>
-              </View>
-            ))}
-          </View>
+      {jobMatch.preferred_skills_matched.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Preferred Skills</Text>
+          {jobMatch.preferred_skills_matched.map((skill, index) => (
+            <SkillCard key={`pref-${index}`} {...skill} />
+          ))}
         </View>
       )}
-  </Card>
-);
+    </ScrollView>
+  );
+};
 
+// Projects Tab - Simplified
 const ProjectsTab = ({projectVerification}) => {
+  const verificationRate = parseFloat(projectVerification.summary.verification_rate);
+  
   return (
-    <ScrollView style={styles.tabContent}>
-      {projectVerification.projects.map((project, index) => (
-        <ProjectCard key={index} project={project} />
-      ))}
+    <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
+      {/* Summary Stats */}
+      <View style={styles.overallScoreSection}>
+        <Text style={styles.sectionTitle}>Project Verification</Text>
+        <View style={styles.scoreGrid}>
+          <ScoreCard 
+            title="Verification Rate" 
+            score={`${verificationRate}%`}
+            color={verificationRate >= 80 ? '#10B981' : verificationRate >= 60 ? '#F59E0B' : '#EF4444'}
+            subtitle="Projects verified"
+          />
+          <ScoreCard 
+            title="Total Projects" 
+            score={projectVerification.projects.length}
+            color="#6B7280"
+            subtitle="Portfolio items"
+          />
+        </View>
+      </View>
+
+      {/* Projects List */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Project Details</Text>
+        {projectVerification.projects.map((project, index) => (
+          <View key={index} style={styles.projectCard}>
+            <View style={styles.projectHeader}>
+              <View style={styles.projectInfo}>
+                <Text style={styles.projectName}>{project.name}</Text>
+                <Text style={styles.projectUrl}>{project.url}</Text>
+              </View>
+              <View style={[
+                styles.verificationBadge,
+                {backgroundColor: project.verification_score >= 8 ? '#D1FAE5' : '#FEF3C7'}
+              ]}>
+                <Text style={[
+                  styles.verificationScore,
+                  {color: project.verification_score >= 8 ? '#065F46' : '#92400E'}
+                ]}>
+                  {project.verification_score.toFixed(1)}
+                </Text>
+              </View>
+            </View>
+            
+            <View style={styles.projectStatus}>
+              <Icon 
+                name={project.status === 'Verified' ? 'shield-checkmark' : 'time'} 
+                size={16} 
+                color={project.status === 'Verified' ? '#10B981' : '#F59E0B'} 
+              />
+              <Text style={styles.projectStatusText}>{project.status}</Text>
+            </View>
+
+            {project.languages && project.languages.length > 0 && (
+              <View style={styles.languagesContainer}>
+                <Text style={styles.languagesTitle}>Technologies:</Text>
+                <View style={styles.languagesList}>
+                  {project.languages.slice(0, 5).map((lang, idx) => (
+                    <View key={idx} style={styles.languageTag}>
+                      <Text style={styles.languageText}>{lang.name}</Text>
+                    </View>
+                  ))}
+                  {project.languages.length > 5 && (
+                    <Text style={styles.moreLanguages}>+{project.languages.length - 5} more</Text>
+                  )}
+                </View>
+              </View>
+            )}
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 };
 
+// Experience Tab - Simplified
 const ExperienceTab = ({profileMatch}) => {
+  const experienceScore = profileMatch.results.overall_scores.experience_score;
+  
   return (
-    <ScrollView style={styles.tabContent}>
-      {profileMatch.results.experience.detailed.map((exp, index) => (
-        <ExperienceCard
-          key={index}
-          experience={{
-            company: exp.resume_data.company_name,
-            title: exp.resume_data.job_title,
-            duration: `${exp.resume_data.start_date} - ${exp.resume_data.end_date}`,
-          }}
-          detailedMetrics={exp.match_metrics}
-        />
-      ))}
+    <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
+      {/* Overall Score */}
+      <View style={styles.overallScoreSection}>
+        <Text style={styles.sectionTitle}>Experience Analysis</Text>
+        <View style={styles.scoreGrid}>
+          <ScoreCard 
+            title="Experience Score" 
+            score={`${experienceScore.toFixed(1)}/10`}
+            color={experienceScore >= 7 ? '#10B981' : experienceScore >= 5 ? '#F59E0B' : '#EF4444'}
+            subtitle="Based on verification"
+          />
+          <ScoreCard 
+            title="Companies" 
+            score={profileMatch.results.experience.summary.length}
+            color="#6B7280"
+            subtitle="Work history"
+          />
+        </View>
+      </View>
+
+      {/* Experience Details */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Work History</Text>
+        {profileMatch.results.experience.summary.map((experience, index) => (
+          <View key={index} style={styles.experienceCard}>
+            <View style={styles.experienceHeader}>
+              <View style={styles.experienceInfo}>
+                <Text style={styles.companyName}>{experience.company}</Text>
+                <Text style={styles.jobTitle}>{experience.title}</Text>
+                <Text style={styles.duration}>{experience.duration}</Text>
+              </View>
+              <View style={[
+                styles.matchScoreBadge,
+                {backgroundColor: experience.match_score >= 7 ? '#D1FAE5' : '#FEF3C7'}
+              ]}>
+                <Text style={[
+                  styles.matchScoreText,
+                  {color: experience.match_score >= 7 ? '#065F46' : '#92400E'}
+                ]}>
+                  {experience.match_score.toFixed(1)}
+                </Text>
+              </View>
+            </View>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 };
 
+// Main Component
 const RecruiterAnalysisDashboard = ({route}) => {
   const layout = useWindowDimensions();
   const {analysisData} = route.params;
-  const data = analysisData;
-  const {project_verification, profile_match, job_match} = data;
+  const {project_verification, profile_match, job_match} = analysisData;
 
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     {
       key: 'job_match',
       title: 'Job Match',
-      score: jobMatch => {
-        const reqCount = job_match.required_skills_matched.length;
-        const prefCount = job_match.preferred_skills_matched.length;
-        const requirementScore =
-          (job_match.experience_match.meets_requirement ? 1 : 0) +
-          (job_match.education_match.meets_requirement ? 1 : 0);
-        return (
-          ((reqCount * 3 + prefCount + requirementScore * 2) /
-            (3 * reqCount + prefCount + 4)) *
-          10
-        );
-      },
+      icon: 'briefcase',
     },
     {
       key: 'projects',
       title: 'Projects',
-      score:
-        project_verification.summary.verification_rate === '100.0%' ? 10 : 7,
+      icon: 'folder',
     },
     {
       key: 'experience',
       title: 'Experience',
-      score: profile_match.results.overall_scores.experience_score,
+      icon: 'business',
     },
   ]);
 
@@ -311,39 +283,22 @@ const RecruiterAnalysisDashboard = ({route}) => {
         return null;
     }
   };
-  const getScoreColor = score => {
-    if (score >= 8) return '#4CAF50';
-    if (score >= 6) return '#FFA000';
-    return '#F44336';
-  };
 
   const renderTabBar = props => (
     <TabBar
       {...props}
       indicatorStyle={styles.indicator}
+      style={styles.tabBar}
       renderLabel={({route, focused}) => (
         <View style={styles.tabLabel}>
+          <Icon 
+            name={route.icon} 
+            size={18} 
+            color={focused ? '#3B82F6' : '#9CA3AF'} 
+          />
           <Text style={[styles.tabText, focused && styles.tabTextFocused]}>
             {route.title}
           </Text>
-          <View
-            style={[
-              styles.scoreChip,
-              {
-                backgroundColor: getScoreColor(
-                  typeof route.score === 'function'
-                    ? route.score(job_match)
-                    : route.score,
-                ),
-              },
-            ]}>
-            <Text style={styles.scoreText}>
-              {(typeof route.score === 'function'
-                ? route.score(job_match)
-                : route.score
-              ).toFixed(1)}
-            </Text>
-          </View>
         </View>
       )}
     />
@@ -354,6 +309,7 @@ const RecruiterAnalysisDashboard = ({route}) => {
       <TabView
         navigationState={{index, routes}}
         renderScene={renderScene}
+        renderTabBar={renderTabBar}
         onIndexChange={setIndex}
         initialLayout={{width: layout.width}}
       />
@@ -364,494 +320,272 @@ const RecruiterAnalysisDashboard = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F6FA',
-  },
-  header: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    paddingHorizontal: 16,
-    backgroundColor: '#FFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-    marginBottom: 16,
-  },
-  overallScore: {
-    alignItems: 'center',
-    backgroundColor: '#F8F9FA',
-    padding: 16,
-    borderRadius: 12,
-    minWidth: 120,
-  },
-  overallScoreValue: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#2196F3',
-  },
-  overallScoreLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
+    backgroundColor: '#F9FAFB',
   },
   tabBar: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFFFFF',
     elevation: 0,
     shadowOpacity: 0,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: '#E5E7EB',
   },
   indicator: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#3B82F6',
     height: 3,
   },
   tabLabel: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   tabText: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 14,
+    color: '#9CA3AF',
     fontWeight: '500',
   },
   tabTextFocused: {
-    color: '#2196F3',
-  },
-  scoreChip: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  scoreText: {
-    color: '#FFF',
-    fontWeight: '600',
-    fontSize: 12,
+    color: '#3B82F6',
   },
   tabContent: {
     flex: 1,
     padding: 16,
-    // paddingVertical: 24,
-    marginBottom: 10,
   },
-  projectCard: {
-    marginBottom: 16,
-    padding: 16,
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    elevation: 2,
-  },
-  projectName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 4,
-  },
-  projectUrl: {
-    fontSize: 14,
-    color: '#2196F3',
-    marginBottom: 12,
-  },
-  projectStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  stat: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  languages: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-  },
-  languageItem: {
-    flexDirection: 'row',
-    backgroundColor: '#F0F0F0',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    gap: 4,
-  },
-  languageName: {
-    fontSize: 12,
-    color: '#1A1A1A',
-    fontWeight: '500',
-  },
-  languageBytes: {
-    fontSize: 12,
-    color: '#666',
-  },
-  experienceCard: {
-    marginBottom: 16,
-    padding: 16,
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    elevation: 2,
-  },
-  companyName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 4,
-  },
-  jobTitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 4,
-  },
-  duration: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 16,
-  },
-  metricsContainer: {
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-    paddingTop: 16,
-  },
-  metricsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 12,
-  },
-  overallScoreContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#F8F9FA',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  overallScoreLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  detailedMetrics: {
-    gap: 12,
-  },
-  metricBar: {
-    gap: 4,
-  },
-  metricLabelContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  metricLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  metricValue: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1A1A1A',
-  },
-  progressBarBackground: {
-    height: 6,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    borderRadius: 3,
-  },
-  projectSummary: {
-    backgroundColor: '#FFF',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    elevation: 2,
-  },
-  summaryTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 12,
-  },
-  summaryGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  summaryItem: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-    padding: 12,
-    borderRadius: 8,
-    minWidth: 100,
-  },
-  summaryLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-  },
-  requirementsSection: {
-    gap: 12,
+  overallScoreSection: {
     marginBottom: 24,
   },
-  skillsSection: {
-    gap: 12,
-    marginBottom: 24,
-  },
-  preferredSkillsSection: {
-    gap: 12,
+  section: {
     marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 8,
+    color: '#111827',
+    marginBottom: 16,
+  },
+  scoreGrid: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  scoreCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  scoreCardTitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  scoreCardValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  scoreCardSubtitle: {
+    fontSize: 12,
+    color: '#9CA3AF',
   },
   requirementCard: {
+    backgroundColor: '#FFFFFF',
     padding: 16,
-    backgroundColor: '#FFF',
     borderRadius: 12,
-    elevation: 2,
+    marginBottom: 12,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   requirementHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
     marginBottom: 8,
   },
   requirementTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: '#111827',
   },
-  requirementBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  requirementBadgeText: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  requirementJustification: {
+  requirementText: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280',
     lineHeight: 20,
   },
   skillCard: {
+    backgroundColor: '#FFFFFF',
     padding: 16,
-    backgroundColor: '#FFF',
     borderRadius: 12,
-    elevation: 2,
-    marginBottom: 16,
+    marginBottom: 12,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  skillHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   skillName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: '#111827',
     textTransform: 'capitalize',
-    marginBottom: 4,
   },
-  skillProject: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+  projectBadge: {
+    backgroundColor: '#EFF6FF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  projectBadgeText: {
+    fontSize: 12,
+    color: '#3B82F6',
+    fontWeight: '500',
   },
   skillDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280',
     lineHeight: 20,
   },
   projectCard: {
-    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
     padding: 16,
-    backgroundColor: '#FFF',
     borderRadius: 12,
-    elevation: 2,
+    marginBottom: 12,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   projectHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  projectTitleContainer: {
+  projectInfo: {
     flex: 1,
-    marginRight: 16,
+    marginRight: 12,
   },
   projectName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: '#111827',
     marginBottom: 4,
   },
   projectUrl: {
     fontSize: 14,
-    color: '#2196F3',
+    color: '#3B82F6',
   },
-  projectScoreBadge: {
-    backgroundColor: '#E3F2FD',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
+  verificationBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    minWidth: 40,
     alignItems: 'center',
   },
-  projectScoreText: {
-    fontSize: 16,
+  verificationScore: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#1976D2',
   },
-  projectStatusContainer: {
+  projectStatus: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    gap: 6,
+    marginBottom: 12,
   },
-  projectStatusLabel: {
+  projectStatusText: {
     fontSize: 14,
-    color: '#666',
-    marginRight: 8,
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  projectStatusValue: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  matchJustification: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 16,
+    color: '#6B7280',
   },
   languagesContainer: {
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-    paddingTop: 16,
+    borderTopColor: '#E5E7EB',
+    paddingTop: 12,
   },
   languagesTitle: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontWeight: '500',
+    color: '#374151',
     marginBottom: 8,
   },
-  languages: {
+  languagesList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-  },
-  languageItem: {
-    flexDirection: 'row',
-    backgroundColor: '#F5F5F5',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 8,
     gap: 6,
-    alignItems: 'center',
   },
-  languageName: {
-    fontSize: 13,
-    color: '#1A1A1A',
-    fontWeight: '500',
+  languageTag: {
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
   },
-  languageBytes: {
-    fontSize: 13,
-    color: '#666',
+  languageText: {
+    fontSize: 12,
+    color: '#374151',
   },
-  header: {
+  moreLanguages: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontStyle: 'italic',
+  },
+  experienceCard: {
+    backgroundColor: '#FFFFFF',
     padding: 16,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderRadius: 12,
+    marginBottom: 12,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
-  jobTitleSection: {
-    marginBottom: 16,
-  },
-  jobTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-    marginBottom: 4,
-  },
-  companyName: {
-    fontSize: 18,
-    color: '#2196F3',
-    marginBottom: 4,
-  },
-  location: {
-    fontSize: 16,
-    color: '#666',
-  },
-  jobDetailsGrid: {
+  experienceHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#E0E0E0',
+    alignItems: 'flex-start',
   },
-  detailItem: {
+  experienceInfo: {
     flex: 1,
+    marginRight: 12,
   },
-  detailLabel: {
-    fontSize: 12,
-    color: '#666',
+  companyName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
     marginBottom: 4,
   },
-  detailValue: {
+  jobTitle: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#1A1A1A',
+    color: '#6B7280',
+    marginBottom: 2,
   },
-  skillsSection: {
-    marginTop: 8,
+  duration: {
+    fontSize: 12,
+    color: '#9CA3AF',
   },
-  skillGroup: {
-    marginBottom: 12,
+  matchScoreBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    minWidth: 40,
+    alignItems: 'center',
   },
-  skillLabel: {
+  matchScoreText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
-    marginBottom: 8,
-  },
-  skillTags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  tag: {
-    backgroundColor: '#E3F2FD',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-  },
-  tagText: {
-    fontSize: 14,
-    color: '#1976D2',
   },
 });
 

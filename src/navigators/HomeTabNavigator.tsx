@@ -7,47 +7,47 @@ import SettingsScreen from '../screens/SettingsScreen';
 import { StyleSheet } from 'react-native';
 import { useNavigationState } from '@react-navigation/native';
 import { RouteNameContext } from '../../App';
+import { useTheme } from '../theme/ThemeContext';
 
 const BottomTab = createMaterialBottomTabNavigator();
 
 const HomeTabNavigator = () => {
-  const { currentRouteName } = React.useContext(RouteNameContext);
-
+  const routeNameContext = React.useContext(RouteNameContext);
+  const { theme } = useTheme();
 
   return (
     <BottomTab.Navigator
-    initialRouteName="Jobs"
+      initialRouteName="Jobs"
       activeColor="#007AFF"
       inactiveColor="#8E8E93"
       barStyle={[
         styles.tabBar,
-        { display: currentRouteName === 'InnerHome' ? 'none' : 'flex',},
+        { display: routeNameContext?.currentRouteName === 'InnerHome' ? 'none' : 'flex',},
+        {
+          borderTopColor: theme.colors.border,
+          backgroundColor: theme.colors.tabBar,
+        },
       ]}
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ color }) => {
+        tabBarIcon: ({ focused, color }) => {
           let iconName;
-          switch (route.name) {
-            case 'Jobs':
-              iconName = 'briefcase-outline';
-              break;
-            case 'Candidates':
-              iconName = 'people-outline';
-              break;
-            case 'Settings':
-              iconName = 'settings-outline';
-              break;
-            default:
-              iconName = 'ellipse-outline';
-              break;
+
+          if (route.name === 'Jobs') {
+            iconName = focused ? 'briefcase' : 'briefcase-outline';
+          } else if (route.name === 'Recently Scanned') {
+            iconName = focused ? 'time' : 'time-outline';
+          } else if (route.name === 'Settings') {
+            iconName = focused ? 'settings' : 'settings-outline';
           }
-          return <Icon name={iconName} color={color} size={24} />;
+
+          return <Icon name={iconName} size={26} color={color} />;
         },
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: theme.colors.textInverse,
+        tabBarInactiveTintColor: theme.colors.textInverse + '80',
       })}
     >
       <BottomTab.Screen name="Jobs" component={JobsStackNavigator} />
-      <BottomTab.Screen name="Candidates" component={RecentlyScannedPdfsScreen} />
+      <BottomTab.Screen name="Recently Scanned" component={RecentlyScannedPdfsScreen} />
       <BottomTab.Screen name="Settings" component={SettingsScreen} />
     </BottomTab.Navigator>
   );
@@ -56,13 +56,11 @@ const HomeTabNavigator = () => {
 const styles = StyleSheet.create({
   tabBar: {
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    backgroundColor: 'white',
   },
 });
 

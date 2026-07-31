@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LandingScreen from '../screens/WelcomeScreen';
 import AuthScreen from '../screens/AuthScreen';
 import ForgetPasswordScreen from '../screens/ForgetPasswordScreen';
+import CompanySelectionScreen from '../screens/CompanySelectionScreen';
 import HomeTabNavigator from './HomeTabNavigator';
 
 const Stack = createNativeStackNavigator();
@@ -123,6 +124,13 @@ const AppNavigator = () => {
       <Stack.Screen
         name="ForgotPassword"
         component={ForgetPasswordScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="CompanySelection"
+        component={CompanySelectionScreen}
         options={{
           headerShown: false,
         }}

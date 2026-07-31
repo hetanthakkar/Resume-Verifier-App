@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import {SafeAreaView, Platform, ScrollView} from 'react-native';
+import {SafeAreaView, ScrollView} from 'react-native';
 import {Carousel} from './Carousel';
 import {AuthButtons} from './AuthButtons';
 import {Background} from './Background';
@@ -29,9 +29,7 @@ const WelcomeScreen = ({navigation}) => {
           onScroll={handleScroll}
         />
         <AuthButtons
-          platform={Platform.OS}
           onGoogleSignIn={handleGoogleSignIn}
-          onAppleSignIn={() => console.log('Continue with Apple')}
           onEmailSignIn={() => navigation.navigate('Login')}
         />
       </Background>

@@ -19,6 +19,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import EditModal from './EditModal';
 import SafeAreaWrapper from '../components/SafeAreaWrapper';
+import {useTheme} from '../theme/ThemeContext';
+import ThemeSelector from '../theme/ThemeSelector';
 
 interface SettingRowProps {
   icon: string;
@@ -100,36 +102,38 @@ const SettingsScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation();
-  // Fetch profile from API
-  const fetchProfileFromAPI = async () => {
-    try {
-      const token = await AsyncStorage.getItem('accessToken');
-      const response = await fetch(`${API_BASE_URL}/profile/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const { theme, themeMode } = useTheme();
+  const [editField, setEditField] = useState<keyof ProfileData | null>(null);
+  const [showThemeModal, setShowThemeModal] = useState(false);
+// Fetch profile from API
+const fetchProfileFromAPI = async () => {
+  try {
+    const token = await AsyncStorage.getItem('accessToken');
+    const response = await fetch(`${API_BASE_URL}/auth/me/`, {  // Changed from /profile/
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      if (!response.ok) throw new Error('Failed to fetch profile');
+    if (!response.ok) throw new Error('Failed to fetch profile');
 
-      const data = await response.json();
-      const profileWithTimestamp = {
-        ...data,
-        lastUpdated: Date.now(),
-      };
+    const data = await response.json();
+    const profileWithTimestamp = {
+      ...data,
+      lastUpdated: Date.now(),
+    };
 
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.USER_PROFILE,
-        JSON.stringify(profileWithTimestamp),
-      );
+    await AsyncStorage.setItem(
+      STORAGE_KEYS.USER_PROFILE,
+      JSON.stringify(profileWithTimestamp),
+    );
 
-      setProfile(profileWithTimestamp);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch profile');
-    }
-  };
-
+    setProfile(profileWithTimestamp);
+    setError(null);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to fetch profile');
+  }
+};
   const loadProfileFromStorage = async () => {
     try {
       const storedProfile = await AsyncStorage.getItem(
@@ -149,7 +153,7 @@ const SettingsScreen: React.FC = () => {
     console.log('field', field);
     try {
       const token = await AsyncStorage.getItem('accessToken');
-      const response = await fetch(`${API_BASE_URL}/profile/update/`, {
+      const response = await fetch(`${API_BASE_URL}/profile/update/`, {  // This endpoint exists
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -157,20 +161,20 @@ const SettingsScreen: React.FC = () => {
         },
         body: JSON.stringify({[field]: value}),
       });
-
+  
       if (!response.ok) throw new Error('Failed to update profile');
-
+  
       const updatedProfile = {
         ...profile,
         [field]: value,
         lastUpdated: Date.now(),
       };
-
+  
       await AsyncStorage.setItem(
         STORAGE_KEYS.USER_PROFILE,
         JSON.stringify(updatedProfile),
       );
-
+  
       setProfile(updatedProfile);
       return true;
     } catch (err) {
@@ -178,7 +182,6 @@ const SettingsScreen: React.FC = () => {
       return false;
     }
   };
-
   useEffect(() => {
     const initializeProfile = async () => {
       setLoading(true);
@@ -207,9 +210,7 @@ const SettingsScreen: React.FC = () => {
 
     return () => clearInterval(refreshInterval);
   }, []);
-  const [editField, setEditField] = useState<
-    'name' | 'company' | 'email' | null
-  >(null);
+
   const gradientColors = [
     ['#FF6B6B', '#FF8E8E'], // Red
     ['#4ECDC4', '#45B7A8'], // Teal
@@ -280,12 +281,12 @@ const SettingsScreen: React.FC = () => {
     return <ActivityIndicator />;
   }
   return (
-    <SafeAreaWrapper backgroundColor="#F8F9FA" showGradient={false}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaWrapper showGradient={false}>
+      <StatusBar barStyle={theme.colors.text === '#FFFFFF' ? "light-content" : "dark-content"} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.contentWrapper}>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Settings</Text>
+            <Text style={[styles.headerTitle, { color: theme.colors.primary }]}>Settings</Text>
           </View>
 
           <View style={styles.section}>
@@ -316,23 +317,24 @@ const SettingsScreen: React.FC = () => {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Appearance</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Appearance</Text>
             <SettingRow
               icon="color-palette-outline"
               label="Theme"
-              value="Light"
+              value={themeMode.charAt(0).toUpperCase() + themeMode.slice(1)}
               colors={gradientColors[5]}
+              onPress={() => setShowThemeModal(true)}
             />
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Legal</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Legal</Text>
             <SettingRow
               icon="document-text-outline"
               label="Terms and Conditions"
               colors={gradientColors[3]}
             />
-            <Text style={styles.description}>
+            <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
               Review the terms and conditions to understand your rights and
               responsibilities.
             </Text>
@@ -349,6 +351,28 @@ const SettingsScreen: React.FC = () => {
           />
         </View>
       </ScrollView>
+      
+      {/* Theme Selector Modal */}
+      <Modal
+        visible={showThemeModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowThemeModal(false)}>
+        <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+                Choose Theme
+              </Text>
+              <TouchableOpacity onPress={() => setShowThemeModal(false)}>
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+            <ThemeSelector />
+          </View>
+        </View>
+      </Modal>
+
       {editField && (
         <EditModal
           visible={true}
@@ -368,7 +392,6 @@ const SettingsScreen: React.FC = () => {
 const styles1 = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -386,7 +409,6 @@ const styles1 = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#007AFF',
   },
   section: {
     marginBottom: 24,
@@ -396,7 +418,6 @@ const styles1 = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 16,
     marginBottom: 8,
-    color: '#1E1E1E',
   },
   row: {
     flexDirection: 'row',
@@ -422,13 +443,33 @@ const styles1 = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: '#666',
     marginHorizontal: 16,
     marginTop: 8,
   },
   logoutSection: {
     marginTop: 'auto',
     marginBottom: 24,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    borderRadius: 12,
+    padding: 20,
+    width: '90%',
+    maxWidth: 400,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
 

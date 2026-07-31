@@ -2,12 +2,15 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {BottomTabBar} from '@react-navigation/material-bottom-tabs';
+import { useTheme } from '../theme/ThemeContext';
 
 const CustomTabBar = props => {
+  const { theme } = useTheme();
+  
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#FF9FF3', '#F368E0']}
+        colors={theme.colors.gradients.purple}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 1}}
         style={styles.gradient}>

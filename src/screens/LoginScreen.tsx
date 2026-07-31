@@ -19,18 +19,27 @@ import IonIcons from 'react-native-vector-icons/Ionicons';
 import GradientText from './gradienttext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SafeAreaWrapper from '../components/SafeAreaWrapper';
+import { useTheme } from '../theme/ThemeContext';
 
 // Type definitions
 interface LoginScreenProps {
+  route: {
+    params?: {
+      googleUser?: any;
+      isGoogleSignIn?: boolean;
+    };
+  };
   navigation: any;
 }
 
 const {width, height} = Dimensions.get('window');
 
 const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
+  const { theme } = useTheme();
+
   // State management
   const googleUser = route.params?.googleUser;
-  const isGoogleSignIn = route.params?.isGoogleSignIn;
+  const isGoogleSignIn = route.params?.isGoogleSignIn || false;
 
   // State management
   const [email, setEmail] = useState<string>(googleUser?.email || '');
@@ -41,13 +50,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
   const [showOTP, setShowOTP] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(!isGoogleSignIn);
   const [showName, setShowName] = useState<boolean>(isGoogleSignIn);
-  const [showCompany, setShowCompany] = useState<boolean>(isGoogleSignIn);
+  const [showCompany, setShowCompany] = useState<boolean>(false);
   const [otp, setOTP] = useState<string[]>(['', '', '', '', '', '']);
   const [showLottie, setShowLottie] = useState<boolean>(!isGoogleSignIn);
   const [isOTPComplete, setIsOTPComplete] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isNewUser, setIsNewUser] = useState<boolean>(
-    isGoogleSignIn === true ? true : false,
+    isGoogleSignIn ? true : false,
   );
   const API_URL = Platform.select({
     ios: 'http://localhost:8000',
@@ -160,35 +169,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
   };
   const handleSubmit = async () => {
     console.log('handle submit', email);
-    if (!email || !name || !company || isLoading) return;
+    if (!email || !name || isLoading) return;
     setIsLoading(true);
 
     try {
-      // Just update the user info
-      const response = await fetch(`${API_URL}/api/auth/update-profile/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${googleUser?.accessToken}`,
-        },
-        body: JSON.stringify({
-          name,
-          company,
-        }),
+      // Navigate to company selection screen
+      navigation.navigate('CompanySelection', {
+        googleUser: googleUser,
+        user: { ...googleUser, name },
+        accessToken: googleUser?.accessToken,
+        refreshToken: googleUser?.refreshToken,
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        await AsyncStorage.setItem('accessToken', data.access);
-        await AsyncStorage.setItem('refreshToken', data.refresh);
-        await AsyncStorage.setItem('userData', JSON.stringify(data.user));
-        navigation.navigate('Home');
-      } else {
-        Alert.alert('Error', data.error || 'Update failed');
-      }
     } catch (error) {
       console.error('Error:', error);
-      Alert.alert('Error', 'Update failed');
+      Alert.alert('Error', 'Failed to proceed');
     } finally {
       setIsLoading(false);
     }
@@ -331,12 +325,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
   };
 
   return (
-    <SafeAreaWrapper backgroundColor="white" showGradient={false}>
+    <SafeAreaWrapper showGradient={false}>
+      <StatusBar barStyle={theme.colors.text === '#FFFFFF' ? "light-content" : "dark-content"} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
-        <StatusBar barStyle="dark-content" />
-
         <ScrollView
           ref={scrollViewRef}
           style={styles.scrollView}
@@ -417,33 +410,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({route, navigation}) => {
               </Animated.View>
             )}
 
-            {showCompany && (
-              <Animated.View
-                style={[
-                  styles.inputContainer,
-                  {
-                    opacity: slideAnimation,
-                    transform: [
-                      {
-                        translateY: slideAnimation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [20, 0],
-                        }),
-                      },
-                    ],
-                  },
-                ]}>
-                <Text style={styles.label}>Company</Text>
-                <TextInput
-                  style={styles.input}
-                  value={company}
-                  onChangeText={setCompany}
-                  placeholder="Enter your company name"
-                  placeholderTextColor="#A0AEC0"
-                  editable={!isLoading}
-                />
-              </Animated.View>
-            )}
+            {/* Company selection moved to separate screen */}
 
             {showPassword && !isGoogleSignIn && (
               <Animated.View
@@ -724,10 +691,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  headerTitle: {
-    marginLeft: 200,
+  googleEmailNote: {
+    fontSize: 12,
+    color: '#718096',
+    marginTop: 4,
+    fontStyle: 'italic',
   },
-
   titleContainer: {
     marginLeft: -20,
   },

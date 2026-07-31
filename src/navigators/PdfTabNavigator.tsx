@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {View, Text, StyleSheet} from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -7,9 +8,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import PDFViewScreen from '../screens/PDFViewScreen';
 import StatisticsScreen from '../screens/StatisticsScreen';
 import SummaryViewScreen from '../screens/SummaryViewScreen';
+import CommentsScreen from '../screens/CommentsScreen';
 import {useNavigation} from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 const TabBarIcon = ({name, focused, color}) => (
   <View style={styles.iconContainer}>
@@ -18,7 +21,26 @@ const TabBarIcon = ({name, focused, color}) => (
   </View>
 );
 
-const TabNavigator = props => {
+const PdfStackNavigator = ({route}) => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen
+        name="PdfTabNavigator"
+        component={PdfTabNavigator}
+        initialParams={route.params}
+      />
+      <Stack.Screen
+        name="Comments"
+        component={CommentsScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const PdfTabNavigator = props => {
   const navigation = useNavigation();
   useEffect(() => {
     const hideAllTabBars = () => {
@@ -119,6 +141,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  tabBar: {
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5',
+  },
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#007AFF',
+    marginTop: 2,
+  },
 });
 
-export default TabNavigator;
+export default PdfStackNavigator;
